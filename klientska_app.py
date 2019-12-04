@@ -1,12 +1,13 @@
-import tkinter as tk
 
+import tkinter as tk
+import datetime
 h=720
 w=1280
 
 root = tk.Tk()
-can = tk.Canvas(root,width=w,height=h)
+can = tk.Canvas(root,width=w,height=h, bg='#beefff')
 can.pack()
-
+labelMenuImg=0
 
 
 def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
@@ -35,10 +36,7 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
     return can.create_polygon(points, **kwargs, smooth=True,fill=color)
 
 def frame2():
-    global prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
-    can.delete('all')
-    prihlasit_btn.destroy()
-    ID_entry.destroy()
+    global prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn
 
     round_rectangle(100, 100, w-100, h-100, radius=50,color='#71CAE7', outline='black',width=3)
     
@@ -62,6 +60,11 @@ def frame2():
     karty_btn=tk.Button(root,text='KARTY',command=karty_def)
     karty_btn.place(width=200,height=25,x=w//2-355,y=530)
 
+    odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
+    odhlasenie_btn.place(width=100,height=50,x=w-120,y=30)
+
+
+
 def frame3():
     global scrollbar, trans_list, spat_btn
     vymaz_pravu_stranu()
@@ -82,7 +85,7 @@ def frame3():
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
 
-    spat_btn = tk.Button(root,text='spat',command=spat_def)
+    spat_btn = tk.Button(root,text='SPÄŤ',command=spat_def)
     spat_btn.place(width=200,height=25,x=100,y=60)
 ##    transakcia=suma
 ##    p=transakcia//10
@@ -90,7 +93,6 @@ def frame3():
 ##        can.create_rectangle(700,600,800,600-p*10,fill='green')
 ##    else:
 ##        can.create_rectangle(w-330,h-100,w-230,h-100-20-p,fill='red')
-
 
     
 
@@ -117,55 +119,111 @@ def platobny_prikaz_def():
     prijmy_tf=False
 
 def karty_def():
-    global platobny_prikaz_tf, karty_tf, prijmy_tf, splatdlh_btn, karty_list
+    global platobny_prikaz_tf, karty_tf, prijmy_tf, splatdlh_btn, karty_list, dlh, splatene,suma2_entry,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
     vymaz_pravu_stranu()
     
     can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
+    
+    suma2_entry = tk.Entry()
+    suma2_entry.pack()
+    suma2_entry.place(width=200,height=25,x=w//2+155,y=h-300)
 
-    splatdlh_btn=tk.Button(root,text='splatit dlh',command=frame2)
-    splatdlh_btn.place(width=200,height=25,x=w//2+155,y=410)
+    dlh=0
 
+    can.create_text(w//2+255, h-330, text='Zadajte sumu', font='Arial 15')
+    splatdlh_btn=tk.Button(root,text='SPLATIT DLH',command=splatit)
+    splatdlh_btn.place(width=200,height=25,x=w//2+155,y=h-250)
+
+    
     karty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    karty_list.insert(1, "KREDITNA KARTA, dlh = 120$")
+    karty_list.insert(1, 'KREDITNA KARTA '+str(dlh))
     karty_list.insert(2, "DEBETNA KARTA")
     karty_list.place(x=w//2+65,y=200)
     
     karty_tf=True
     platobny_prikaz_tf=False
     prijmy_tf=False
+
+def splatit():
+    global dlh, splatene,suma2_entry
+    splatene=suma2_entry.get()
+    print(splatene)
+    
+   
     
 def prijmy_def():
-    global platobny_prikaz_tf, karty_tf, prijmy_tf, prijmy_list
+    global platobny_prikaz_tf, karty_tf, prijmy_tf, prijmy_list,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
+
     vymaz_pravu_stranu()
     
     can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25')
-    
-    prijmy_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    prijmy_list.insert(1, "420 / SK83 0000 0000 0000 0000 0000")
-    prijmy_list.insert(2, "1420 / SK83 0000 0000 0000 0000 0001")
-    prijmy_list.insert(3, "4,20 / SK83 0000 0000 0000 0000 0002")
-    prijmy_list.insert(4, "300 / SK83 0000 0000 0000 0000 0001")
-    prijmy_list.insert(5, "400 / SK83 0000 0000 0000 0000 0000")
-    prijmy_list.insert(6, "480 / SK83 0000 0000 0000 0000 0044")
-    prijmy_list.place(x=w//2+65,y=200)
 
+    pocet=18
+    prijmy_list = tk.Listbox(root, width=43, height = pocet, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
+    prijmy_list.insert(1, "SK83 0000 0000 0000 0000 0000")
+    prijmy_list.insert(2, "Pavol Novák")
+    prijmy_list.insert(1, "420€")
+    prijmy_list.insert(4, "SK83 0000 0000 0000 0000 0002")
+    prijmy_list.insert(5, "Jaroslav Čižnár")
+    prijmy_list.insert(2, "421€")
+    prijmy_list.insert(5, "SK83 0000 0000 0000 0000 0000")
+    prijmy_list.insert(6, "Róbert Fico")
+    prijmy_list.insert(2, "423€")
+    prijmy_list.insert(7, "SK83 0000 0000 0000 0000 0000")
+    prijmy_list.insert(8, "Marián Kočner")
+    prijmy_list.insert(2, "424€")
+    prijmy_list.insert(9, "SK83 0000 0000 0000 0000 0002")
+    prijmy_list.insert(10, "Marián Kuffa")
+    prijmy_list.insert(2, "425€")
+    prijmy_list.place(x=w//2+65,y=200)
+    
     karty_tf=False
     platobny_prikaz_tf=False
     prijmy_tf=True
 
     
 def login():
-    global prihlasit_btn, ID_entry
+    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, prihlasene
+    can.create_rectangle(0,0,w,h,fill='#71CAE7')
+    uctovnyDen = datetime.datetime.now()
 
-    prihlasit_btn=tk.Button(root,text='potvrdit',command=frame2, cursor='right_ptr')
-    prihlasit_btn.place(width=200,x=w//2-100,y=h//2+75)
+    if prihlasene:
+        odhlasenie_btn.destroy()
+
+    prihlasene=False
+    can.create_text((1/2)*w,h-(0.8*h),text="Klientská Aplikácia Prihlásenie" ,font="Arial 30", anchor="w")
+    can.create_text((1/2*w,h-(0.72*h)),text="Aktuálny účtovný deň: " + uctovnyDen.strftime("%d. %b. %Y"),font="Arial 16", anchor="w")
+    can.create_text((1/2*w,h-(0.60*h)),text="ID obchodníka: ",font="Arial 20", anchor="w")
+    ID_entry = tk.Entry(width=30,font = "Helvetica 15 bold")
+    ID_entry.pack()
+    ID_entry.place(x=1/2*w + 200,y=h-(0.62*h),height=30)
     
-    ID_entry=tk.Entry(root,width=10, font='Arial 15', cursor='right_ptr')
-    ID_entry.place(width=200,x=w//2-100,y=h//2+40)
+    can.create_text((1/2*w,h-(0.60*h)+35),text="Zadajte heslo: ",font="Arial 20", anchor="w")
+    PW_entry = tk.Entry(width=30,font = "Helvetica 15 bold")
+    PW_entry.pack()
+    PW_entry.place(x=1/2*w + 200,y=h-(0.62*h)+35,height=30)
     
-    round_rectangle(400, 200, w-400, h-200, radius=50,color='#71CAE7', outline='black',width=3)
-    can.create_text(w//2,h//2+20,text='Zadajte vase ID',font='Arial 15')
-    can.create_text(w//2, h//2-40, text='LOGIN',font='Arial 30')
+    prihlasit_btn = tk.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=prihlas)
+    prihlasit_btn.pack()
+    prihlasit_btn.place(x=1/2*w,y=h-(0.4*h))
+    menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
+    
+    labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
+    labelMenuImgimage = menuImg
+    labelMenuImg.pack()
+    labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")
+
+def odhlas():
+    global prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
+    can.delete('all')
+    ucty_list.destroy()
+    karty_btn.destroy()
+    transakcia_btn.destroy()
+    platprik_btn.destroy()
+    prijmy_btn.destroy()
+    vymaz_pravu_stranu()
+    vymaz_lavu_stranu()
+    login()
     
 def vymaz_pravu_stranu():
     global potvrdplatbu_btn, prijemca_entry, suma_entry, splatdlh_btn, karty_list, prijmy_list
@@ -181,6 +239,7 @@ def vymaz_pravu_stranu():
         frame2()
         splatdlh_btn.destroy()
         karty_list.destroy()
+        suma2_entry.destroy()
         
     elif prijmy_tf:
         can.delete('all')
@@ -204,10 +263,22 @@ def spat_def():
     spat_btn.destroy()
     frame2()
 
+def prihlas():
+    global prihlasit_btn, ID_entry, PW_entry, prihlasene
+    prihlasene=True
+    can.delete('all')
+    prihlasit_btn.destroy()
+    ID_entry.destroy()
+    PW_entry.destroy()
+    labelMenuImg.destroy()
+    frame2()
+    
 # VYSVETLIVKY: tf = true/false, btn = BUTTON
 
 karty_tf=False
 platobny_prikaz_tf=False
 prijmy_tf=False
-login()
+prihlasene=False
+mena=['Pavol Novák',"Jaroslav Čižnár", "Róbert Fico","Marián Kočner","Marián Kuffa"]
 
+login()
