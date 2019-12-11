@@ -63,7 +63,7 @@ def frame2():
 
     if z_loginu:
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
-        odhlasenie_btn.place(width=100,height=50,x=w-120,y=30)
+        odhlasenie_btn.place(width=100,height=25,x=w-150,y=20)
     z_loginu=False
 
 
@@ -269,21 +269,24 @@ def spat_def():
 
 def prihlas():
     global prihlasit_btn, ID_entry, PW_entry, prihlasene
-    prihlasene=True
-    can.delete('all')
-    prihlasit_btn.destroy()
-    ID_entry.destroy()
-    PW_entry.destroy()
-    labelMenuImg.destroy()
-    frame2()
-    
-# VYSVETLIVKY: tf = true/false, btn = BUTTON
+    for p in range(len(ID)):
+        if ID_entry.get() == ID[p] and  PW_entry.get() == hesla[p]:
+            prihlasene=True
+            can.delete('all')
+            prihlasit_btn.destroy()
+            ID_entry.destroy()
+            PW_entry.destroy()
+            labelMenuImg.destroy()
+            frame2()
+        else:
+            can.create_text(1/2*w + 367,h-(0.62*h)+85, text='Nesprávne zadané prihlasovacie údaje',fill='red',font='Arial 15')
+
 bol_f3 = False # positka kvoli blbnutiu odhlasenia f3 je frame 3
 dlh = 0
 karty_tf=False
 platobny_prikaz_tf=False
 prijmy_tf=False
 z_loginu=True
-mena=['Pavol Novák',"Jaroslav Čižnár", "Róbert Fico","Marián Kočner","Marián Kuffa"]
-
+ID=['1','2']
+hesla=['111','slovo']
 login()
