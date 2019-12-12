@@ -4,6 +4,8 @@ import os
 h=720
 w=1280
 
+# DOROBIT : vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
+
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
 can.pack()
