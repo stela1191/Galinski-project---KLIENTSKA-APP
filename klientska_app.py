@@ -1,5 +1,6 @@
 import tkinter as tk
 import datetime
+import os
 h=720
 w=1280
 
@@ -198,14 +199,14 @@ def login():
     can.create_text((1/2)*w,h-(0.8*h),text="Klientská Aplikácia Prihlásenie" ,font="Arial 30", anchor="w")
     can.create_text((1/2*w,h-(0.72*h)),text="Aktuálny účtovný deň: " + uctovnyDen.strftime("%d. %b. %Y"),font="Arial 16", anchor="w")
     can.create_text((1/2*w,h-(0.60*h)),text="ID obchodníka: ",font="Arial 20", anchor="w")
-    ID_entry = tk.Entry(width=30,font = "Helvetica 15 bold")
+    ID_entry = tk.Entry(width=33,font = "Helvetica 15 bold")
     ID_entry.pack()
-    ID_entry.place(x=1/2*w + 200,y=h-(0.62*h),height=30)
-    can.create_text((1/2*w,h-(0.60*h)+35),text="Zadajte heslo: ",font="Arial 20", anchor="w")
+    ID_entry.place(x=1/2*w + 240,y=h-(0.62*h),height=30)
+    can.create_text((1/2*w,h-(0.60*h)+35),text="Zadajte rodné číslo: ",font="Arial 20", anchor="w")
     
-    PW_entry = tk.Entry(width=30,font = "Helvetica 15 bold")
+    PW_entry = tk.Entry(width=33,font = "Helvetica 15 bold")
     PW_entry.pack()
-    PW_entry.place(x=1/2*w + 200,y=h-(0.62*h)+35,height=30)
+    PW_entry.place(x=1/2*w + 240,y=h-(0.62*h)+35,height=30)
     
     prihlasit_btn = tk.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=prihlas)
     prihlasit_btn.pack()
@@ -268,9 +269,10 @@ def spat_def():
     frame2()
 
 def prihlas():
-    global prihlasit_btn, ID_entry, PW_entry, prihlasene
-    for p in range(len(ID)):
-        if ID_entry.get() == ID[p] and  PW_entry.get() == hesla[p]:
+    global prihlasit_btn, ID_entry, PW_entry, prihlasene,ID_klientov, rodne_cisla
+    citaj_klientov()
+    for p in range(pocet):
+        if ID_entry.get() == ID_klientov[p] and  PW_entry.get() == rodne_cisla[p]:
             prihlasene=True
             can.delete('all')
             prihlasit_btn.destroy()
@@ -278,15 +280,36 @@ def prihlas():
             PW_entry.destroy()
             labelMenuImg.destroy()
             frame2()
+            return
         else:
             can.create_text(1/2*w + 367,h-(0.62*h)+85, text='Nesprávne zadané prihlasovacie údaje',fill='red',font='Arial 15')
 
+def kon_klienti():
+    #global nacitaj
+    if not os.path.exists('KLIENTI_LOCK.txt'):
+        return True
+    else:
+        return False
+    can.after(100,kon_klienti)
+
+def citaj_klientov():
+    global ID_klientov, rodne_cisla, pocet
+    if kon_klienti():
+        subor = open('KLIENTI.txt','r')
+        pocet = int(subor.readline().strip())
+        for r in range(pocet): 
+            riadok = subor.readline().strip()
+            k=riadok.split(';')
+            ID_klientov.append(k[0])
+            rodne_cisla.append(k[3])
+
+kon_klienti()    
+ID_klientov=[]
+rodne_cisla=[]
 bol_f3 = False # positka kvoli blbnutiu odhlasenia f3 je frame 3
 dlh = 0
 karty_tf=False
 platobny_prikaz_tf=False
 prijmy_tf=False
 z_loginu=True
-ID=['1','2']
-hesla=['111','slovo']
 login()
