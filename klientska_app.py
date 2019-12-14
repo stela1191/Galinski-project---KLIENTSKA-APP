@@ -192,10 +192,10 @@ def prijmy_def():
 
     
 def login():
-    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu
+    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene
     can.create_rectangle(0,0,w,h,fill='#71CAE7')
     uctovnyDen = datetime.datetime.now()
-
+    prihlasene = False
     z_loginu=True
         
     can.create_text((1/2)*w,h-(0.8*h),text="Klientská Aplikácia Prihlásenie" ,font="Arial 30", anchor="w")
@@ -272,31 +272,41 @@ def spat_def():
 
 def prihlas():
     global prihlasit_btn, ID_entry, PW_entry, prihlasene,ID_klientov, rodne_cisla
+    kon_klienti()
     citaj_klientov()
-    for p in range(pocet):
-        if ID_entry.get() == ID_klientov[p] and  PW_entry.get() == rodne_cisla[p]:
-            prihlasene=True
-            can.delete('all')
-            prihlasit_btn.destroy()
-            ID_entry.destroy()
-            PW_entry.destroy()
-            labelMenuImg.destroy()
-            frame2()
-            return
-        else:
-            can.create_text(1/2*w + 367,h-(0.62*h)+85, text='Nesprávne zadané prihlasovacie údaje',fill='red',font='Arial 15')
-
-def kon_klienti():
-    #global nacitaj
-    if not os.path.exists('KLIENTI_LOCK.txt'):
-        return True
+    if lock_klienti:
+        can.delete('lock_oznam')
+        can.delete('nespravne_udaje_oznam')
+        can.create_text(1/2*w + 425,h-(0.62*h)+85, text='Prebieha audit, počkajte prosim',fill='red',font='Arial 15', tags='lock_oznam')
     else:
-        return False
-    can.after(100,kon_klienti)
+        can.delete('lock_oznam')
+        can.delete('nespravne_udaje_oznam')
+        for p in range(pocet):
+            if ID_entry.get() == ID_klientov[p] and  PW_entry.get() == rodne_cisla[p]:
+                prihlasene=True
+                can.delete('all')
+                prihlasit_btn.destroy()
+                ID_entry.destroy()
+                PW_entry.destroy()
+                labelMenuImg.destroy()
+                frame2()
+                return
+            else:
+                can.create_text(1/2*w + 425,h-(0.62*h)+85, text='Nesprávne zadané prihlasovacie údaje',fill='red',font='Arial 15', tags='nespravne_udaje_oznam')
+                
+def kon_klienti():
+    global lock_klienti
+    if not os.path.exists('KLIENTI_LOCK.txt'):
+        lock_klienti = False
+    else:
+        lock_klienti = True
+    if not prihlasene:
+        can.after(1,kon_klienti)
 
 def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet
-    if kon_klienti():
+    if not lock_klienti:
+        lock_subor = open('KLIENTI_LOCK.txt','w')
         subor = open('KLIENTI.txt','r')
         pocet = int(subor.readline().strip())
         for r in range(pocet): 
@@ -304,8 +314,40 @@ def citaj_klientov():
             k=riadok.split(';')
             ID_klientov.append(k[0])
             rodne_cisla.append(k[3])
+        subor.close()
+        lock_subor.close()
+        os.remove("KLIENTI_LOCK.txt")
+    else:
+        pocet=0
 
-kon_klienti()    
+def kon_karty():
+    global lock_karty
+    if not os.path.exists('KARTY_LOCK.txt'):
+        lock_karty = False
+    else:
+        lock_karty = True
+    if not prihlasene:
+        can.after(1,kon_klienti)
+
+def citaj_karty():
+    global ID_klientov, rodne_cisla, pocet
+    if not lock_karty:
+        lock_subor = open('KARTY_LOCK.txt','w')
+        subor = open('KARTY.txt','r')
+        pocet = int(subor.readline().strip())
+        for r in range(pocet): 
+            riadok = subor.readline().strip()
+            k=riadok.split(';')
+            ID_klientov.append(k[0])
+            rodne_cisla.append(k[3])
+        subor.close()
+        lock_subor.close()
+        os.remove("KARTY_LOCK.txt")
+    else:
+        pocet=0
+        
+##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////           
+# NA KARTACH ESTE PRACUJEM, ZATIAL NIESU TIE DEFINICIE FUNKCNE :)
 ID_klientov=[]
 rodne_cisla=[]
 bol_f3 = False # positka kvoli blbnutiu odhlasenia f3 je frame 3
