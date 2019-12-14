@@ -140,6 +140,22 @@ def karty_def():
     global platobny_prikaz_tf, karty_tf, prijmy_tf, kreditka,splatdlh_btn, karty_list, dlh, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
     vymaz_pravu_stranu()
     
+    kon_karty()
+    citaj_karty()
+
+    karty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
+    poradie = 0
+    for h in range(len(id_uctu_karty)):
+        if prihlaseny_ID == id_uctu_karty[h]:
+            poradie+=1
+            if typy_karty[h] == 'D':
+                typ_k = 'DEBETNÁ KARTA '
+                karty_list.insert(poradie, typ_k)
+            else:
+                typ_k = 'KREDITNÁ KARTA, '
+                karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[h]))
+    karty_list.place(x=w//2+65,y=200)
+    
     can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
     
     suma2_entry = tk.Entry()
@@ -149,12 +165,7 @@ def karty_def():
     can.create_text(w//2+255, h-330, text='Zadajte sumu', font='Arial 15')
     splatdlh_btn=tk.Button(root,text='SPLATIT DLH',command=splatit)
     splatdlh_btn.place(width=200,height=25,x=w//2+155,y=h-250)
-
-    karty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    karty_list.insert(1, 'KREDITNA KARTA '+str(dlh))
-    karty_list.insert(2, "DEBETNA KARTA")
-    karty_list.place(x=w//2+65,y=200)
-    
+  
     karty_tf=True
     platobny_prikaz_tf=False
     prijmy_tf=False
@@ -271,7 +282,7 @@ def spat_def():
     frame2()
 
 def prihlas():
-    global prihlasit_btn, ID_entry, PW_entry, prihlasene,ID_klientov, rodne_cisla
+    global prihlasit_btn, ID_entry, PW_entry, prihlasene,ID_klientov, rodne_cisla, prihlaseny_ID
     kon_klienti()
     citaj_klientov()
     if lock_klienti:
@@ -283,6 +294,7 @@ def prihlas():
         can.delete('nespravne_udaje_oznam')
         for p in range(pocet):
             if ID_entry.get() == ID_klientov[p] and  PW_entry.get() == rodne_cisla[p]:
+                prihlaseny_ID = ID_entry.get()
                 prihlasene=True
                 can.delete('all')
                 prihlasit_btn.destroy()
@@ -326,20 +338,26 @@ def kon_karty():
         lock_karty = False
     else:
         lock_karty = True
-    if not prihlasene:
-        can.after(1,kon_klienti)
+##  if not karty_tf:
+##        can.after(1,kon_klienti)
 
 def citaj_karty():
-    global ID_klientov, rodne_cisla, pocet
+    global cisla_karty, typy_karty, dlh_karty, id_uctu_karty
     if not lock_karty:
         lock_subor = open('KARTY_LOCK.txt','w')
         subor = open('KARTY.txt','r')
         pocet = int(subor.readline().strip())
+        id_uctu_karty = []
+        cisla_karty = []
+        typy_karty = []
+        dlh_karty = []
         for r in range(pocet): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
-            ID_klientov.append(k[0])
-            rodne_cisla.append(k[3])
+            id_uctu_karty.append(k[6])
+            cisla_karty.append(k[3])
+            typy_karty.append(k[2])
+            dlh_karty.append(k[7])
         subor.close()
         lock_subor.close()
         os.remove("KARTY_LOCK.txt")
@@ -347,7 +365,9 @@ def citaj_karty():
         pocet=0
         
 ##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////           
-# NA KARTACH ESTE PRACUJEM, ZATIAL NIESU TIE DEFINICIE FUNKCNE :)
+# DOROBIT TREBA SPLATENIE DLHU, KARTY SU FUNKCNE 
+prihlaseny_ID = 1
+
 ID_klientov=[]
 rodne_cisla=[]
 bol_f3 = False # positka kvoli blbnutiu odhlasenia f3 je frame 3
