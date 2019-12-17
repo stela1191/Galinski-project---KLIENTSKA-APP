@@ -88,7 +88,7 @@ def frame2():
 
 
 def frame3():
-    global scrollbar, trans_list, spat_btn, bol_f3
+    global scrollbar, trans_list, spat_btn, bol_f3,id_klienta_ucty,citaj_ucty,cislo_uctu,komu,z_uctu,prihlaseny_ID
     bol_f3 = True
     
     vymaz_pravu_stranu()
@@ -97,15 +97,23 @@ def frame3():
     round_rectangle(50, 50, w-50, h-50, radius=50,color='#71CAE7', outline='black',width=3)
     
     can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
-
+    
+    kon_transakcie_ucty()
+    citaj_transakcie_ucty()
+    
     scrollbar = tk.Scrollbar(root)
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
     trans_list = tk.Listbox(root, font='Arial 15')
     trans_list.place(x=100,y=100,width=w-220,height=h-200)
-    for x in range(100):    
-        trans_list.insert(x*3, 'Ucet'+100*' ' +'Ostatok')
-        trans_list.insert(x*3+1, 'Komu')
-        trans_list.insert(x*3+2, '')
+    for u in range(len(id_klienta_ucty)):
+       if id_klienta_ucty[u] == komu[u]:
+          z_uctu=cislo_uctu[u]
+          trans_list.insert(u*3, z_uctu +100*' ' +'Ostatok')
+          trans_list.insert(u*3+1, 'Komu')
+          trans_list.insert(u*3+2, '')
+       print('ID'+id_klienta_ucty[u])
+       print('KOMU'+komu[u])
+       
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
 
@@ -409,36 +417,38 @@ def citaj_ucty():
         lock_subor.close()
         os.remove("UCTY_LOCK.txt")
 
-##def kon_transakcie_ucty():
-##    global lock_transakcie_ucty
-##    if not os.path.exists('TRANSAKCIE_UCTY_LOCK.txt'):
-##        lock_transakcie_ucty = False
-##    else:
-##        lock_transakcie_ucty = True
-##
-##
-##def citaj_transakcie_ucty():
-##    global id_uctu, id_klienta,suma,id_transakcie
-##    if not lock_karty:
-##        lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
-##        subor = open('TRANSAKCIE_UCTY.txt','r')
-##        pocet = int(subor.readline().strip())
-##        id_uctu = []
-##        id_klienta = []
-##        suma = []
-##        id_transakcie = []
-##        for r in range(pocet): 
-##            riadok = subor.readline().strip()
-##            k=riadok.split(';')
-##            id_uctu.append(k[4])
-##            id_klienta.append(k[3])
-##            suma.append(k5])
-##            id_transakcie.append(k[0])
-##        subor.close()
-##        lock_subor.close()
-##        os.remove("KARTY_LOCK.txt")
-##    else:
-##        pocet=0
+def kon_transakcie_ucty():
+    global lock_transakcie_ucty
+    if not os.path.exists('TRANSAKCIE_UCTY_LOCK.txt'):
+        lock_transakcie_ucty = False
+    else:
+        lock_transakcie_ucty = True
+
+
+def citaj_transakcie_ucty():
+    global id_uctu, id_klienta,poslana_suma,id_transakcie,komu
+    if not lock_transakcie_ucty:
+        lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
+        subor = open('TRANSAKCIE_UCTY.txt','r')
+        pocet = int(subor.readline().strip())
+        id_uctu = []
+        id_klienta = []
+        poslana_suma = []
+        id_transakcie = []
+        komu = []
+        for r in range(pocet): 
+            riadok = subor.readline().strip()
+            k=riadok.split(';')
+            id_uctu.append(k[4])
+            id_klienta.append(k[3])
+            poslana_suma.append(k[5])
+            id_transakcie.append(k[0])
+            komu.append(k[6])
+        subor.close()
+        lock_subor.close()
+        os.remove("TRANSAKCIE_UCTY_LOCK.txt")
+    else:
+        pocet=0
         
 ##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////           
 prihlaseny_ID = 1
