@@ -40,26 +40,34 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
     return can.create_polygon(points, **kwargs, smooth=True,fill=color)
 
 def frame2():
-    global prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu,id_uctu, id_klienta,cislo_uctu, stav_uctu
-
-    round_rectangle(100, 100, w-100, h-100, radius=50,color='#71CAE7', outline='black',width=3)
+    global prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu
 
     kon_ucty()
     citaj_ucty()
     
+##    frame2_Img = tk.PhotoImage(master=can,file='obrazky/frame.png')
+##    label_frame2_Img = tk.Label(image = frame2_Img,borderwidth=0)
+##    label_frame2_Imgimage = frame2_Img
+##    label_frame2_Img.pack()
+##    label_frame2_Img.place(x=0.03*w,y=h-(0.55*h), anchor="w")
+    
+    round_rectangle(100, 100, w-100, h-100, radius=50,color='#71CAE7', outline='black',width=3)
+    
     can.create_text(w//2-255,150,text='ÚČTY',font='Arial 25')
     can.create_text(w//2-255,300,text='zostatok na ucte: 1234$6',font='Arial 20')
     
-    ucty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    #ucty_list.insert(1, 'BEZNY UCET',str(cislo_uctu))
-    #ucty_list.insert(2, 'FIREMNY UCET',str(cislo_uctu))
-    ucty_list.place(x=w//2-450,y=200)
+    ucty_list = tk.Listbox(root, width=43, height = 8, font='Arial 11',selectmode='SINGLE', xscrollcommand=True)
     poradie = 0
-    for u in range(2):
-        if prihlaseny_ID == id_klienta[u]:
+    for l in range(pocet_uctov):
+        if prihlaseny_ID == id_klienta_ucty[l]:
             poradie+=1
-            ucty_list.insert(poradie, 'BEZNY UCET'+20*' '+'SK '+cislo_uctu[u])
-            
+            if typ_uctu[l] == 'P':
+                typ_u = 'SÚKROMNÝ ÚČET '
+            else:
+                typ_u = 'OCHODNÝ ÚČET '
+            ucty_list.insert(poradie*2, typ_u)
+            ucty_list.insert(poradie*2+1, str(cislo_uctu[l]) + ', ' + 'zostatok: ' + str(stav_uctu[l]))
+    ucty_list.place(x=w//2-450,y=200)
     
     transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3)
     transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
@@ -72,7 +80,7 @@ def frame2():
 
     karty_btn=tk.Button(root,text='KARTY',command=karty_def)
     karty_btn.place(width=200,height=25,x=w//2-355,y=530)
-
+    
     if z_loginu:
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
         odhlasenie_btn.place(width=100,height=25,x=w-150,y=20)
@@ -94,8 +102,8 @@ def frame3():
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
     trans_list = tk.Listbox(root, font='Arial 15')
     trans_list.place(x=100,y=100,width=w-220,height=h-200)
-    for t in range(len(transakcie_ucty)):    
-        trans_list.insert(x*3, 'Ucet'+100*' ' +'Suma')
+    for x in range(100):    
+        trans_list.insert(x*3, 'Ucet'+100*' ' +'Ostatok')
         trans_list.insert(x*3+1, 'Komu')
         trans_list.insert(x*3+2, '')
     trans_list.config(yscrollcommand=scrollbar.set)
@@ -103,7 +111,14 @@ def frame3():
 
     spat_btn = tk.Button(root,text='SPÄŤ',command=spat_def)
     spat_btn.place(width=200,height=25,x=100,y=60)
+##    transakcia=suma
+##    p=transakcia//10
+##    if transakcia>0:
+##        can.create_rectangle(700,600,800,600-p*10,fill='green')
+##    else:
+##        can.create_rectangle(w-330,h-100,w-230,h-100-20-p,fill='red')
 
+    
 
 def platobny_prikaz_def():
     global platobny_prikaz_tf, karty_tf, prijmy_tf, potvrdplatbu_btn, prijemca_entry, suma_entry
@@ -139,33 +154,36 @@ def splatit():
     print(dlh)
     
 def karty_def():
-    global platobny_prikaz_tf, karty_tf, prijmy_tf, kreditka,splatdlh_btn, karty_list, dlh, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
+    global platobny_prikaz_tf, karty_tf, prijmy_tf, kreditka, splatdlh_btn, karty_list, dlh, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
     vymaz_pravu_stranu()
     
     kon_karty()
     citaj_karty()
 
     karty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
+
     poradie = 0
-    for h in range(len(id_uctu_karty)):
-        if prihlaseny_ID == id_uctu_karty[h]:
+    for m in range(len(id_uctu_karty)):
+        if prihlaseny_ID == id_uctu_karty[m]:
             poradie+=1
-            if typy_karty[h] == 'D':
+            if typy_karty[m] == 'D':
                 typ_k = 'DEBETNÁ KARTA '
                 karty_list.insert(poradie, typ_k)
             else:
                 typ_k = 'KREDITNÁ KARTA, '
-                karty_list.insert(poradie, typ_k + 20*' '+'dlh na karte: ' + str(dlh_karty[h]))
-                suma2_entry = tk.Entry()
-                suma2_entry.pack()
-                suma2_entry.place(width=200,height=25,x=w//2+155,y=h-300)
-                can.create_text(w//2+255, h-130, text='Zadajte sumu', font='Arial 15')
-                splatdlh_btn=tk.Button(root,text='SPLATIT DLH',command=splatit)
-                splatdlh_btn.place(width=200,height=25,x=w//2+155,y=h-250)
-                
+                karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
     karty_list.place(x=w//2+65,y=200)
+    
     can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
-  
+
+    suma2_entry = tk.Entry(root)
+    suma2_entry.place(width=200,height=25,x=w//2+155,y=h-300)
+
+    can.create_text(w//2+255, h-330, text='Zadajte sumu', font='Arial 15')
+
+    splatdlh_btn=tk.Button(root,text='SPLATIT DLH',command=splatit)
+    splatdlh_btn.place(width=200,height=25,x=w//2+155,y=h-250)
+
     karty_tf=True
     platobny_prikaz_tf=False
     prijmy_tf=False
@@ -361,43 +379,35 @@ def citaj_karty():
         subor.close()
         lock_subor.close()
         os.remove("KARTY_LOCK.txt")
-    else:
-        pocet=0
-
+        
 def kon_ucty():
     global lock_ucty
     if not os.path.exists('UCTY_LOCK.txt'):
         lock_ucty = False
     else:
         lock_ucty = True
-
-
-def citaj_ucty():
-    global id_uctu, id_klienta,cislo_uctu, stav_uctu
+##    if prihlaseny:
+##        can.after(100, kon_ucty)
+def citaj_ucty():   
+    global id_klienta_ucty, cislo_uctu, typ_uctu, stav_uctu, pocet_uctov
     if not lock_ucty:
         lock_subor = open('UCTY_LOCK.txt','w')
         subor = open('UCTY.txt','r')
-        pocet = int(subor.readline().strip())
-        id_uctu = []
-        id_klienta = []
+        pocet_uctov = int(subor.readline().strip())
+        id_klienta_ucty = []
         cislo_uctu = []
+        typ_uctu = []
         stav_uctu = []
-        pocet_uctov=0
         for r in range(pocet): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
-            id_uctu.append(k[0])
-            id_klienta.append(k[1])
+            id_klienta_ucty.append(k[1])
             cislo_uctu.append(k[2])
+            typ_uctu.append(k[3])
             stav_uctu.append(k[4])
-            print(id_klienta)
-        
         subor.close()
         lock_subor.close()
         os.remove("UCTY_LOCK.txt")
-    else:
-        pocet=0
-
 
 ##def kon_transakcie_ucty():
 ##    global lock_transakcie_ucty
@@ -431,18 +441,16 @@ def citaj_ucty():
 ##        pocet=0
         
 ##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////           
-# DOROBIT TREBA SPLATENIE DLHU-neviem preco to nefunguje
-# nastane problem s uctami ked niekto bude mat viac uctov
-# a v transakciach neviem ze z ktoreho suboru mam citat
-#inac UCTY sa uz daju citat
 prihlaseny_ID = 1
-
+lock_ucty=False
 ID_klientov=[]
 rodne_cisla=[]
-bol_f3 = False # positka kvoli blbnutiu odhlasenia f3 je frame 3
+bol_f3 = False # poistka kvoli blbnutiu odhlasenia f3 je frame 3
 dlh = 0
 karty_tf=False
 platobny_prikaz_tf=False
 prijmy_tf=False
 z_loginu=True
 login()
+
+## AUTOMATICKE REFRESHOVANI SPRAVITTT
