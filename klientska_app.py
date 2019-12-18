@@ -76,19 +76,19 @@ def frame2():
     ucty_list.bind('<<ListboxSelect>>',vyber_ucet_def)
     ucty_list.place(x=w//2-425,y=200)
 
-    vyber_ucet_btn=tk.Button(root,text='VYBER UCET',command=skuska_active)
+    vyber_ucet_btn=tk.Button(root,text='VYBER UCET',command=potvrd_ucet_def, state='active')
     vyber_ucet_btn.place(width=200,height=25,x=w//2-355,y=370)
     
-    transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3)
+    transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
     transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
     
-    platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def)
+    platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='disabled')
     platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
     
-    prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def)
+    prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='disabled')
     prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
 
-    karty_btn=tk.Button(root,text='KARTY',command=karty_def)
+    karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='disabled')
     karty_btn.place(width=200,height=25,x=w//2-355,y=530)
     
     if z_loginu:
@@ -96,12 +96,27 @@ def frame2():
         odhlasenie_btn.place(width=100,height=25,x=w-150,y=20)
     z_loginu=False
 
-def skuska_active():
-    global transakcia_btn
-    transakcia_btn.destroy()
-    transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
-    transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
-    
+def potvrd_ucet_def():
+    global transakcia_btn, platprik_btn, prijmy_btn, karty_btn, vyber_ucet_btn
+    if vybraty_ucet != '':
+        transakcia_btn.destroy()
+        transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='active')
+        transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
+        
+        platprik_btn.destroy()
+        platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='active')
+        platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
+        
+        prijmy_btn.destroy()
+        prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='active')
+        prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
+        
+        karty_btn.destroy()
+        karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
+        karty_btn.place(width=200,height=25,x=w//2-355,y=530)
+
+        print(vybraty_ucet)
+        
 def vyber_ucet_def(event):
     global vybraty_ucet
     m = event.widget
@@ -251,7 +266,9 @@ def prijmy_def():
 
     
 def login():
-    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene, frame_2
+    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene, frame_2, vybraty_ucet
+
+    vybraty_ucet = ''
 
     frame_2 = False
     
@@ -478,7 +495,7 @@ def citaj_ucty():
 ##    else:
 ##        pocet=0
         
-##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////           
+##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 prihlaseny_ID = 1
 lock_ucty=False
 ID_klientov=[]
