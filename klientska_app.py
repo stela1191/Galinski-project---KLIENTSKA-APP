@@ -76,21 +76,30 @@ def frame2():
     ucty_list.bind('<<ListboxSelect>>',vyber_ucet_def)
     ucty_list.place(x=w//2-425,y=200)
 
-    vyber_ucet_btn=tk.Button(root,text='VYBER UCET',command=potvrd_ucet_def, state='active')
-    vyber_ucet_btn.place(width=200,height=25,x=w//2-355,y=370)
-    
-    transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
-    transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
-    
-    platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='disabled')
-    platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
-    
-    prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='disabled')
-    prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
-
-    karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='disabled')
-    karty_btn.place(width=200,height=25,x=w//2-355,y=530)
-    
+    if vybraty_ucet == '':
+        transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
+        transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
+        
+        platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='disabled')
+        platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
+        
+        prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='disabled')
+        prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
+        
+        karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='disabled')
+        karty_btn.place(width=200,height=25,x=w//2-355,y=530)
+    else:
+        transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='active')
+        transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
+        
+        platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='active')
+        platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
+        
+        prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='active')
+        prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
+        
+        karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
+        karty_btn.place(width=200,height=25,x=w//2-355,y=530)
     if z_loginu:
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
         odhlasenie_btn.place(width=100,height=25,x=w-150,y=20)
@@ -129,7 +138,7 @@ def vyber_ucet_def(event):
         else:
             idx = idx//2
     vybraty_ucet=id_uctov_frame2[idx]
-
+    potvrd_ucet_def()
     
 def frame3():
     global scrollbar, trans_list, spat_btn, bol_f3, frame_2
@@ -508,5 +517,4 @@ prijmy_tf=False
 z_loginu=True
 login()
 
-# NEDOROBENE VYBERANIE UCTU, DOROBIT
-## AUTOMATICKE REFRESHOVANI SPRAVI
+
