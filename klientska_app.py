@@ -5,6 +5,7 @@ h=720
 w=1280
 
 # DOROBIT : vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
+# TRANSAKCIE: citanie hotove, musim dorobit potom este farby a skusit ten graf
 
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
@@ -141,7 +142,7 @@ def vyber_ucet_def(event):
     potvrd_ucet_def()
     
 def frame3():
-    global scrollbar, trans_list, spat_btn, bol_f3, frame_2
+    global scrollbar, trans_list, spat_btn, bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko
 
     frame_2 = False
     
@@ -149,6 +150,15 @@ def frame3():
     
     vymaz_pravu_stranu()
     vymaz_lavu_stranu()
+
+    kon_transakcie_ucty()
+    citaj_transakcie_ucty()
+
+    kon_ucty()
+    citaj_ucty()
+    
+    kon_klienti()
+    citaj_klientov()
     
     round_rectangle(50, 50, w-50, h-50, radius=50,color='#71CAE7', outline='black',width=3)
     
@@ -158,21 +168,21 @@ def frame3():
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
     trans_list = tk.Listbox(root, font='Arial 15')
     trans_list.place(x=100,y=100,width=w-220,height=h-200)
-    for x in range(100):    
-        trans_list.insert(x*3, 'Ucet'+100*' ' +'Ostatok')
-        trans_list.insert(x*3+1, 'Komu')
-        trans_list.insert(x*3+2, '')
+    for i in range(pocet_transakcii):
+        if komu[i]==prihlaseny_ID:
+            if (suma[i][0])=='-':
+                farba='red'
+            else:
+                farba='green'
+            trans_list.insert(i*3, cislo_uctu[i]+130*' '+suma[i]+' €') #farba este nefunguje
+            trans_list.insert(i*3+1, krstne_meno[i]+' '+priezvisko[i])
+            trans_list.insert(i*3+2, '')
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
 
     spat_btn = tk.Button(root,text='SPÄŤ',command=spat_def)
     spat_btn.place(width=200,height=25,x=100,y=60)
-##    transakcia=suma
-##    p=transakcia//10
-##    if transakcia>0:
-##        can.create_rectangle(700,600,800,600-p*10,fill='green')
-##    else:
-##        can.create_rectangle(w-330,h-100,w-230,h-100-20-p,fill='red')
+
 
 
 def platobny_prikaz_def():
@@ -393,16 +403,20 @@ def kon_klienti():
         can.after(1,kon_klienti)
 
 def citaj_klientov():
-    global ID_klientov, rodne_cisla, pocet
+    global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
         lock_subor = open('KLIENTI_LOCK.txt','w')
         subor = open('KLIENTI.txt','r')
         pocet = int(subor.readline().strip())
+        krstne_meno=[]
+        priezvisko=[]
         for r in range(pocet): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
             ID_klientov.append(k[0])
             rodne_cisla.append(k[3])
+            krstne_meno.append(k[1])
+            priezvisko.append(k[2])
         subor.close()
         lock_subor.close()
         os.remove("KLIENTI_LOCK.txt")
@@ -473,36 +487,37 @@ def citaj_ucty():
         lock_subor.close()
         os.remove("UCTY_LOCK.txt")
 
-##def kon_transakcie_ucty():
-##    global lock_transakcie_ucty
-##    if not os.path.exists('TRANSAKCIE_UCTY_LOCK.txt'):
-##        lock_transakcie_ucty = False
-##    else:
-##        lock_transakcie_ucty = True
-##
-##
-##def citaj_transakcie_ucty():
-##    global id_uctu, id_klienta,suma,id_transakcie
-##    if not lock_karty:
-##        lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
-##        subor = open('TRANSAKCIE_UCTY.txt','r')
-##        pocet = int(subor.readline().strip())
-##        id_uctu = []
-##        id_klienta = []
-##        suma = []
-##        id_transakcie = []
-##        for r in range(pocet): 
-##            riadok = subor.readline().strip()
-##            k=riadok.split(';')
-##            id_uctu.append(k[4])
-##            id_klienta.append(k[3])
-##            suma.append(k5])
-##            id_transakcie.append(k[0])
-##        subor.close()
-##        lock_subor.close()
-##        os.remove("KARTY_LOCK.txt")
-##    else:
-##        pocet=0
+def kon_transakcie_ucty():
+    global lock_transakcie_ucty
+    if not os.path.exists('TRANSAKCIE_UCTY_LOCK.txt'):
+        lock_transakcie_ucty = False
+    else:
+        lock_transakcie_ucty = True
+
+
+def citaj_transakcie_ucty():
+    global id_uctu, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu
+    if not lock_transakcie_ucty:
+        lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
+        subor = open('TRANSAKCIE_UCTY.txt','r')
+        pocet_transakcii = int(subor.readline().strip())
+        id_uctu = []
+        id_klienta_transakcie = []
+        suma = []
+        id_transakcie = []
+        komu=[]
+        for r in range(pocet_transakcii): 
+            riadok = subor.readline().strip()
+            k=riadok.split(';')
+            id_uctu.append(k[4])
+            id_klienta_transakcie.append(k[3])
+            suma.append(k[5])
+            id_transakcie.append(k[0])
+            komu.append(k[6])
+        subor.close()
+        lock_subor.close()
+        os.remove("TRANSAKCIE_UCTY_LOCK.txt")
+    
         
 ##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 prihlaseny_ID = 1
