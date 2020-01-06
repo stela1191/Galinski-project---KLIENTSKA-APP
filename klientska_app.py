@@ -16,6 +16,7 @@ w=1280
 # OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 # PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
+# vacsina suborov je od chalanov ale tie transakcie ucty su zatial len tak vymyslene
 
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
