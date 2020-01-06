@@ -1,19 +1,27 @@
 import tkinter as tk
 import datetime
 import os
+
 h=720
 w=1280
 
-# DOROBIT : vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
-# TRANSAKCIE: citanie hotove, musim dorobit potom este farby a skusit ten graf
+# DOROBIT : - vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
+#           - GRAF
+#           - Splatenie Dlhu
+#           - Jednotne tlacidla
+#           - Platobny prikaz este nekomunikuje so suborom
+# HOTOVE :  - CITANIE TRANSAKCII
+#           - FAREBNE ODLISENIE TRANSAKCII
+#           - PRIJMY zo suborov
+# OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
+#           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
+# PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
 
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
 can.pack()
 labelMenuImg=0
 
-#users = {} ##mena a hesla na prihlasovanie 
-#users.update({'' : ''})
 
 def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
 
@@ -41,18 +49,12 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
     return can.create_polygon(points, **kwargs, smooth=True,fill=color)
 
 def frame2():
-    global prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
+    global prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
 
     frame_2=True
     
     kon_ucty()
     citaj_ucty()
-    
-##    frame2_Img = tk.PhotoImage(master=can,file='obrazky/frame.png')
-##    label_frame2_Img = tk.Label(image = frame2_Img,borderwidth=0)
-##    label_frame2_Imgimage = frame2_Img
-##    label_frame2_Img.pack()
-##    label_frame2_Img.place(x=0.03*w,y=h-(0.55*h), anchor="w")
     
     round_rectangle(100, 100, w-100, h-100, radius=50,color='#71CAE7', outline='black',width=3)
     
@@ -62,7 +64,7 @@ def frame2():
     ucty_list = tk.Listbox(root, width=43, height = 8, font='Arial 11', xscrollcommand=True)
     poradie = 0
     id_uctov_frame2 = []
-    for l in range(pocet_uctov):
+    for l in range(pocet_uctov-1):#poradie uctov pridat
         if prihlaseny_ID == id_klienta_ucty[l]:
             poradie+=1
             if typ_uctu[l] == 'P':
@@ -73,6 +75,7 @@ def frame2():
             ucty_list.insert(poradie*2+1, str(cislo_uctu[l]) + ', ' + 'zostatok: ' + str(stav_uctu[l]))
             id_uctov_frame2.append(id_uctu[l])
 
+   # prijmy_def() TEORETICKY BY TO MOHLO BYT UZ NA ZACIATKU ZOBRAZENE
             
     ucty_list.bind('<<ListboxSelect>>',vyber_ucet_def)
     ucty_list.place(x=w//2-425,y=200)
@@ -140,9 +143,10 @@ def vyber_ucet_def(event):
             idx = idx//2
     vybraty_ucet=id_uctov_frame2[idx]
     potvrd_ucet_def()
+
     
 def frame3():
-    global scrollbar, trans_list, spat_btn, bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko
+    global scrollbar, trans_list, spat_btn, bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a
 
     frame_2 = False
     
@@ -163,27 +167,43 @@ def frame3():
     round_rectangle(50, 50, w-50, h-50, radius=50,color='#71CAE7', outline='black',width=3)
     
     can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
-
+    cislo=0
+    a=[]
     scrollbar = tk.Scrollbar(root)
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
     trans_list = tk.Listbox(root, font='Arial 15')
     trans_list.place(x=100,y=100,width=w-220,height=h-200)
     for i in range(pocet_transakcii):
         if komu[i]==prihlaseny_ID:
+            a=int(id_klienta_transakcie[i])
+            
+            trans_list.insert(cislo, cislo_uctu[a]+(150-len(suma))*' '+suma[i]+' €')
+            trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
+            trans_list.insert(cislo+2, '')
             if (suma[i][0])=='-':
-                farba='red'
-            else:
-                farba='green'
-            trans_list.insert(i*3, cislo_uctu[i]+130*' '+suma[i]+' €') #farba este nefunguje
-            trans_list.insert(i*3+1, krstne_meno[i]+' '+priezvisko[i])
-            trans_list.insert(i*3+2, '')
+                trans_list.itemconfig(cislo,{'fg': 'red'})
+                trans_list.itemconfig(cislo+1,{'fg': 'red'})
+            if (suma[i][0])=='+':
+                trans_list.itemconfig(cislo,{'fg': 'green'})
+                trans_list.itemconfig(cislo+1,{'fg': 'green'})
+            cislo+=3
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
-
+        
     spat_btn = tk.Button(root,text='SPÄŤ',command=spat_def)
     spat_btn.place(width=200,height=25,x=100,y=60)
 
+    otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko)
+    otvor_okienko.place(width=200,height=40,x=w-150,y=h-30)
 
+#GRAF ESTE NEFUNGUJE
+def okienko():
+    v=400
+    newroot=tk.Tk()
+    newroot.geometry('400x400')
+    okno=tk.Label(newroot,oval(10,10,v-10,v-10))
+    okno.config(font='Arial 30')
+    okno.pack()
 
 def platobny_prikaz_def():
     global platobny_prikaz_tf, karty_tf, prijmy_tf, potvrdplatbu_btn, prijemca_entry, suma_entry
@@ -209,17 +229,16 @@ def platobny_prikaz_def():
 
 
 def splatit():
-    global dlh, splatene,suma2_entry,karty_list,kreditka
+    global dlh, splatene,suma2_entry,karty_list,kreditka,splatenie
     splatene=suma2_entry.get()
     #print(splatene)
     dlh-=int(splatene)
 
     karty_list.insert(1, 'KREDITNA KARTA '+str(dlh))
-    
     print(dlh)
     
 def karty_def():
-    global platobny_prikaz_tf, karty_tf, prijmy_tf, kreditka, splatdlh_btn, karty_list, dlh, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
+    global platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatdlh_btn, karty_list, dlh, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
     vymaz_pravu_stranu()
     kon_karty()
     citaj_karty()
@@ -235,7 +254,7 @@ def karty_def():
                 karty_list.insert(poradie, typ_k)
             else:
                 typ_k = 'KREDITNÁ KARTA, '
-                karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
+                splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
     karty_list.place(x=w//2+65,y=200)
     
     can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
@@ -254,29 +273,30 @@ def karty_def():
 
     
 def prijmy_def():
-    global platobny_prikaz_tf, karty_tf, prijmy_tf, prijmy_list,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
+    global platobny_prikaz_tf, karty_tf,prijmy, prijmy_tf, prijmy_list,prihlasit_btn, suma,ID_entry,pocet_transakcii,krstne_meno,priezvisko,cislo_uctu, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
 
     vymaz_pravu_stranu()
-    
-    can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25')
 
+    kon_transakcie_ucty()
+    citaj_transakcie_ucty()
+    
+    kon_ucty()
+    citaj_ucty()
+    
+    kon_klienti()
+    citaj_klientov()
     pocet=18
+    
+    prijmy=can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25')
     prijmy_list = tk.Listbox(root, width=43, height = pocet, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    prijmy_list.insert(1, "SK83 0000 0000 0000 0000 0000"+20*' '+"420€")
-    prijmy_list.insert(2, "Pavol Novák")
-    prijmy_list.insert(3, "")
-    prijmy_list.insert(4, "SK83 0000 0000 0000 0000 0002"+20*' '+"420€")
-    prijmy_list.insert(5, "Jaroslav Čižnár")
-    prijmy_list.insert(6, "")
-    prijmy_list.insert(7, "SK83 0000 0000 0000 0000 0000"+20*' '+"420€")
-    prijmy_list.insert(8, "Róbert Fico")
-    prijmy_list.insert(9, "")
-    prijmy_list.insert(10, "SK83 0000 0000 0000 0000 0000"+20*' '+"420€")
-    prijmy_list.insert(11, "Marián Kočner")
-    prijmy_list.insert(12, "")
-    prijmy_list.insert(13, "SK83 0000 0000 0000 0000 0002"+20*' '+"420€")
-    prijmy_list.insert(14, "Marián Kuffa")
-    prijmy_list.insert(15, "")
+    
+    for i in range(pocet_transakcii):
+        a=int(id_klienta_transakcie[i])
+        if  prihlaseny_ID==komu[i] and suma[i][0]=='+':
+            prijmy_list.insert(i, cislo_uctu[a]+(50-len(suma))*' '+suma[i])
+            prijmy_list.insert(i+1, krstne_meno[a]+priezvisko[a])
+            prijmy_list.insert(i+2, '')
+#Neviem ci tam chceme pridat aj transakcie kariet
     prijmy_list.place(x=w//2+65,y=200)
     
     karty_tf=False
