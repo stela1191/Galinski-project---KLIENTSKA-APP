@@ -6,17 +6,19 @@ h=720
 w=1280
 
 # DOROBIT : - vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
-#           - GRAF
-#           - Splatenie Dlhu
+#           - GRAF pomer podla realnych udajov
+#           - Vybrat kartu pri splacani dlhu
 #           - Jednotne tlacidla
 #           - Platobny prikaz este nekomunikuje so suborom
+#           - Transakcie funguju zatial len na id klienta a nie na konkretny jeho ucet
 # HOTOVE :  - CITANIE TRANSAKCII
 #           - FAREBNE ODLISENIE TRANSAKCII
 #           - PRIJMY zo suborov
+#           - Nove okno s grafom
+#           - Dlh
 # OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 # PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
-# vacsina suborov je od chalanov ale tie transakcie ucty su zatial len tak vymyslene
 
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
@@ -72,8 +74,8 @@ def frame2():
                 typ_u = 'SÚKROMNÝ ÚČET '
             else:
                 typ_u = 'OBCHODNÝ ÚČET '
-            ucty_list.insert(poradie*2, typ_u)
-            ucty_list.insert(poradie*2+1, str(cislo_uctu[l]) + ', ' + 'zostatok: ' + str(stav_uctu[l]))
+            ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €')
+            ucty_list.insert(poradie*2+1, str(cislo_uctu[l]) )
             id_uctov_frame2.append(id_uctu[l])
 
    # prijmy_def() TEORETICKY BY TO MOHLO BYT UZ NA ZACIATKU ZOBRAZENE
@@ -145,10 +147,9 @@ def vyber_ucet_def(event):
     vybraty_ucet=id_uctov_frame2[idx]
     potvrd_ucet_def()
 
-    
-def frame3():
-    global scrollbar, trans_list, spat_btn, bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a
 
+def frame3():
+    global scrollbar, trans_list, spat_btn, bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,pocet_kladnych,pocet_zapornych,celkova_suma
     frame_2 = False
     
     bol_f3 = True
@@ -170,6 +171,9 @@ def frame3():
     can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
     cislo=0
     a=[]
+    pocet_kladnych=0
+    pocet_zapornych=0
+    celkova_suma=0
     scrollbar = tk.Scrollbar(root)
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
     trans_list = tk.Listbox(root, font='Arial 15')
@@ -177,14 +181,17 @@ def frame3():
     for i in range(pocet_transakcii):
         if komu[i]==prihlaseny_ID:
             a=int(id_klienta_transakcie[i])
-            
             trans_list.insert(cislo, cislo_uctu[a]+(150-len(suma))*' '+suma[i]+' €')
             trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
             trans_list.insert(cislo+2, '')
+            celkova_suma+=int(suma[i])
+            print(celkova_suma)
             if (suma[i][0])=='-':
+                pocet_zapornych+=1
                 trans_list.itemconfig(cislo,{'fg': 'red'})
                 trans_list.itemconfig(cislo+1,{'fg': 'red'})
             if (suma[i][0])=='+':
+                pocet_kladnych+=1
                 trans_list.itemconfig(cislo,{'fg': 'green'})
                 trans_list.itemconfig(cislo+1,{'fg': 'green'})
             cislo+=3
@@ -199,12 +206,18 @@ def frame3():
 
 #GRAF ESTE NEFUNGUJE
 def okienko():
-    v=400
+    global pocet_kladnych,pocet_zapornych,celkova_suma
     newroot=tk.Tk()
-    newroot.geometry('400x400')
-    okno=tk.Label(newroot,oval(10,10,v-10,v-10))
-    okno.config(font='Arial 30')
-    okno.pack()
+    newroot.geometry('310x310')
+    myCanvas = tk.Canvas(newroot, bg="white", height=300, width=300)
+
+    coord = 10, 10, 300, 300
+    arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red")
+    arv2 = myCanvas.create_arc(coord, start=150, extent=215, fill="green")
+
+    myCanvas.pack()
+    root.mainloop()
+
 
 def platobny_prikaz_def():
     global platobny_prikaz_tf, karty_tf, prijmy_tf, potvrdplatbu_btn, prijemca_entry, suma_entry
@@ -232,20 +245,17 @@ def platobny_prikaz_def():
 def splatit():
     global dlh, splatene,suma2_entry,karty_list,kreditka,splatenie
     splatene=suma2_entry.get()
-    #print(splatene)
-    dlh-=int(splatene)
-
-    karty_list.insert(1, 'KREDITNA KARTA '+str(dlh))
-    print(dlh)
+    splatka=True
     
 def karty_def():
-    global platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatdlh_btn, karty_list, dlh, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
+    global platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatka,splatdlh_btn, karty_list, id_uctu_karty,dlh_karty, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
     vymaz_pravu_stranu()
+    
     kon_karty()
     citaj_karty()
 
     karty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-
+    splatka=False
     poradie = 0
     for m in range(len(id_uctu_karty)):
         if prihlaseny_ID == id_uctu_karty[m]:
@@ -255,7 +265,11 @@ def karty_def():
                 karty_list.insert(poradie, typ_k)
             else:
                 typ_k = 'KREDITNÁ KARTA, '
-                splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
+                if splatka==False:
+                    splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
+                else:
+                    splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str((dlh_karty[m])-splatene))
+                
     karty_list.place(x=w//2+65,y=200)
     
     can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
@@ -332,6 +346,7 @@ def login():
     prihlasit_btn = tk.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=prihlas)
     prihlasit_btn.pack()
     prihlasit_btn.place(x=1/2*w,y=h-(0.4*h))
+    #can.bind_all('<Space>',prihlas)
     menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
     
     labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
