@@ -19,6 +19,7 @@ w=1280
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 # PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
 
+#TAKZE 13.1. som spravil vyberanie kariet, uz funguje ze ked na nich kliknes to berie z toho hodnotu, dalej som sa hlboko zamyslal nad tym ako budem robit ostatne veci :D
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
 can.pack()
@@ -52,7 +53,7 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
 
 def frame2():
     global prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
-
+    
     frame_2=True
     
     kon_ucty()
@@ -74,7 +75,7 @@ def frame2():
             else:
                 typ_u = 'OBCHODNÝ ÚČET '
             ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €'+'\n')
-            ucty_list.insert(poradie*2,+str(cislo_uctu[l]) )
+            ucty_list.insert(poradie*2, str(cislo_uctu[l]) )
             id_uctov_frame2.append(id_uctu[l])
 
    # prijmy_def() TEORETICKY BY TO MOHLO BYT UZ NA ZACIATKU ZOBRAZENE
@@ -110,7 +111,8 @@ def frame2():
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
         odhlasenie_btn.place(width=100,height=25,x=w-150,y=20)
     z_loginu=False
-
+##    prijmy_def()     TOTO NEJDE NECHAPEM PRECO... ked to pustim tak sa zacykluje shell
+    
 def potvrd_ucet_def():
     global transakcia_btn, platprik_btn, prijmy_btn, karty_btn, vyber_ucet_btn
     if vybraty_ucet != '':
@@ -130,7 +132,7 @@ def potvrd_ucet_def():
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
         karty_btn.place(width=200,height=25,x=w//2-355,y=530)
 
-        print(vybraty_ucet)
+        #print(vybraty_ucet)
         
 def vyber_ucet_def(event):
     global vybraty_ucet
@@ -145,10 +147,14 @@ def vyber_ucet_def(event):
             idx = idx//2
     vybraty_ucet=id_uctov_frame2[idx]
     potvrd_ucet_def()
+    print(vybraty_ucet)
 
 
 def frame3():
     global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
+
+    vymaz_pravu_stranu()
+    
     frame_2 = False
     
     bol_f3 = True
@@ -184,7 +190,7 @@ def frame3():
             trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
             trans_list.insert(cislo+2, '')
             celkova_suma+=int(suma[i])
-            print(celkova_suma)
+            #print(celkova_suma)
             if (suma[i][0])=='-':
                 sucet_zapornych+=int(suma[i])
                 trans_list.itemconfig(cislo,{'fg': 'red'})
@@ -211,9 +217,9 @@ def okienko():
     myCanvas = tk.Canvas(newroot, bg="white", height=300, width=300)
     
     minusova=sucet_zapornych//360
-    print(minusova)
+    #print(minusova)
     plusova=sucet_kladnych//360
-    print(plusova)
+    #print(plusova)
     coord = 10, 10, 300, 300
     arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red")
     arv2 = myCanvas.create_arc(coord, start=150, extent=215, fill="green")
@@ -274,6 +280,7 @@ def karty_def():
                     splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str((dlh_karty[m])-splatene))
                 
     karty_list.place(x=w//2+65,y=200)
+    karty_list.bind('<<ListboxSelect>>',vyber_karty_def)
     
     can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
 
@@ -289,6 +296,13 @@ def karty_def():
     platobny_prikaz_tf=False
     prijmy_tf=False
 
+def vyber_karty_def(event):
+    global vybrata_karta
+    m = event.widget
+    idx = int(m.curselection()[0])
+    vybrata_karta=id_karty[idx]
+    print(id_karty)
+    print(idx, vybrata_karta)
     
 def prijmy_def():
     global platobny_prikaz_tf, karty_tf,prijmy, prijmy_tf, prijmy_list,prihlasit_btn, suma,ID_entry,pocet_transakcii,krstne_meno,priezvisko,cislo_uctu, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
@@ -478,7 +492,7 @@ def kon_karty():
         lock_karty = True
 
 def citaj_karty():
-    global cisla_karty, typy_karty, dlh_karty, id_uctu_karty
+    global cisla_karty, typy_karty, dlh_karty, id_uctu_karty, id_karty
     if not lock_karty:
         lock_subor = open('KARTY_LOCK.txt','w')
         subor = open('KARTY.txt','r')
@@ -487,6 +501,7 @@ def citaj_karty():
         cisla_karty = []
         typy_karty = []
         dlh_karty = []
+        id_karty = []
         for r in range(pocet): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
@@ -494,6 +509,7 @@ def citaj_karty():
             cisla_karty.append(k[3])
             typy_karty.append(k[2])
             dlh_karty.append(k[7])
+            id_karty.append(k[0])
         subor.close()
         lock_subor.close()
         os.remove("KARTY_LOCK.txt")
@@ -514,7 +530,7 @@ def citaj_ucty():
         lock_subor = open('UCTY_LOCK.txt','w')
         subor = open('UCTY.txt','r')
         pocet_uctov = int(subor.readline().strip())
-        print(pocet_uctov)
+        #print(pocet_uctov)
         id_klienta_ucty = []
         cislo_uctu = []
         typ_uctu = []
