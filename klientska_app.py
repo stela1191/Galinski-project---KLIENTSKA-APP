@@ -11,11 +11,10 @@ w=1280
 #           - Jednotne tlacidla
 #           - Platobny prikaz este nekomunikuje so suborom
 #           - Transakcie funguju zatial len na id klienta a nie na konkretny jeho ucet
-# HOTOVE :  - CITANIE TRANSAKCII
-#           - FAREBNE ODLISENIE TRANSAKCII
-#           - PRIJMY zo suborov
-#           - Nove okno s grafom
-#           - Dlh
+#           - Prijmy pri prihlasovani
+#           - Skus vysvietit ten ucet spolu
+# HOTOVE :  - Pismenka v transakciach
+#           - Prihlasenie cez enter
 # OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 # PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
@@ -74,8 +73,8 @@ def frame2():
                 typ_u = 'SÚKROMNÝ ÚČET '
             else:
                 typ_u = 'OBCHODNÝ ÚČET '
-            ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €')
-            ucty_list.insert(poradie*2+1, str(cislo_uctu[l]) )
+            ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €'+'\n')
+            ucty_list.insert(poradie*2,+str(cislo_uctu[l]) )
             id_uctov_frame2.append(id_uctu[l])
 
    # prijmy_def() TEORETICKY BY TO MOHLO BYT UZ NA ZACIATKU ZOBRAZENE
@@ -149,7 +148,7 @@ def vyber_ucet_def(event):
 
 
 def frame3():
-    global scrollbar, trans_list, spat_btn, bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,pocet_kladnych,pocet_zapornych,celkova_suma
+    global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
     frame_2 = False
     
     bol_f3 = True
@@ -171,8 +170,8 @@ def frame3():
     can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
     cislo=0
     a=[]
-    pocet_kladnych=0
-    pocet_zapornych=0
+    sucet_kladnych=0
+    sucet_zapornych=0
     celkova_suma=0
     scrollbar = tk.Scrollbar(root)
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
@@ -187,11 +186,11 @@ def frame3():
             celkova_suma+=int(suma[i])
             print(celkova_suma)
             if (suma[i][0])=='-':
-                pocet_zapornych+=1
+                sucet_zapornych+=int(suma[i])
                 trans_list.itemconfig(cislo,{'fg': 'red'})
                 trans_list.itemconfig(cislo+1,{'fg': 'red'})
             if (suma[i][0])=='+':
-                pocet_kladnych+=1
+                sucet_kladnych+=int(suma[i])
                 trans_list.itemconfig(cislo,{'fg': 'green'})
                 trans_list.itemconfig(cislo+1,{'fg': 'green'})
             cislo+=3
@@ -206,11 +205,15 @@ def frame3():
 
 #GRAF ESTE NEFUNGUJE
 def okienko():
-    global pocet_kladnych,pocet_zapornych,celkova_suma
+    global sucet_kladnych,sucet_zapornych,celkova_suma
     newroot=tk.Tk()
     newroot.geometry('310x310')
     myCanvas = tk.Canvas(newroot, bg="white", height=300, width=300)
-
+    
+    minusova=sucet_zapornych//360
+    print(minusova)
+    plusova=sucet_kladnych//360
+    print(plusova)
     coord = 10, 10, 300, 300
     arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red")
     arv2 = myCanvas.create_arc(coord, start=150, extent=215, fill="green")
@@ -318,6 +321,8 @@ def prijmy_def():
     platobny_prikaz_tf=False
     prijmy_tf=True
 
+def login_cez_enter(sur):
+    prihlas()
     
 def login():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene, frame_2, vybraty_ucet
@@ -337,25 +342,29 @@ def login():
     ID_entry = tk.Entry(width=33,font = "Helvetica 15 bold")
     ID_entry.pack()
     ID_entry.place(x=1/2*w + 240,y=h-(0.62*h),height=30)
+    ID_entry.bind("<Return>", login_cez_enter) 
+    
     can.create_text((1/2*w,h-(0.60*h)+35),text="Zadajte rodné číslo: ",font="Arial 20", anchor="w")
     
     PW_entry = tk.Entry(width=33,font = "Helvetica 15 bold")
     PW_entry.pack()
     PW_entry.place(x=1/2*w + 240,y=h-(0.62*h)+35,height=30)
+    PW_entry.bind("<Return>", login_cez_enter)
     
     prihlasit_btn = tk.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=prihlas)
     prihlasit_btn.pack()
     prihlasit_btn.place(x=1/2*w,y=h-(0.4*h))
-    #can.bind_all('<Space>',prihlas)
+    
     menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
     
     labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
     labelMenuImgimage = menuImg
     labelMenuImg.pack()
-    labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")                                                           
+    labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")
+
 
 def odhlas():
-    global  ucty_list, karty_btn, transakcia_btn, platprik_btn, prijmy_btn, scrollbar, trans_list, spat_btn,odhlasenie_btn
+    global  ucty_list, karty_btn, transakcia_btn, platprik_btn, prijmy_btn, scrollbar, trans_list, spat_btn,odhlasenie_btn,otvor_okienko
     can.delete('all')
     odhlasenie_btn.destroy()
     vymaz_pravu_stranu()
@@ -364,6 +373,7 @@ def odhlas():
         scrollbar.destroy()
         trans_list.destroy()
         spat_btn.destroy()
+        otvor_okienko.destroy()
     login()
     
 def vymaz_pravu_stranu():
@@ -397,11 +407,12 @@ def vymaz_lavu_stranu():
     ucty_list.destroy()
 
 def spat_def():
-    global scrollbar, trans_list, spat_btn
+    global scrollbar, trans_list, spat_btn,otvor_okienko
     can.delete('all')
     scrollbar.destroy()
     trans_list.destroy()
     spat_btn.destroy()
+    otvor_okienko.destroy()
     frame2()
 
 def prihlas():
@@ -442,7 +453,7 @@ def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
         lock_subor = open('KLIENTI_LOCK.txt','w')
-        subor = open('KLIENTI.txt','r')
+        subor = open('KLIENTI.txt','r',encoding='utf-8')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
         priezvisko=[]
@@ -465,8 +476,6 @@ def kon_karty():
         lock_karty = False
     else:
         lock_karty = True
-##  if not karty_tf:
-##        can.after(1,kon_klienti)
 
 def citaj_karty():
     global cisla_karty, typy_karty, dlh_karty, id_uctu_karty
@@ -553,7 +562,7 @@ def citaj_transakcie_ucty():
         subor.close()
         lock_subor.close()
         os.remove("TRANSAKCIE_UCTY_LOCK.txt")
-    
+
         
 ##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 prihlaseny_ID = 1
