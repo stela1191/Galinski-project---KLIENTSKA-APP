@@ -19,7 +19,6 @@ w=1280
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 # PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
 
-#TAKZE 13.1. som spravil vyberanie kariet, uz funguje ze ked na nich kliknes to berie z toho hodnotu, dalej som sa hlboko zamyslal nad tym ako budem robit ostatne veci :D
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
 can.pack()
@@ -135,7 +134,7 @@ def potvrd_ucet_def():
         #print(vybraty_ucet)
         
 def vyber_ucet_def(event):
-    global vybraty_ucet
+    global vybraty_ucet, stav_vybrateho_uctu
     m = event.widget
     idx = int(m.curselection()[0])
     if idx < 2:
@@ -148,7 +147,7 @@ def vyber_ucet_def(event):
     vybraty_ucet=id_uctov_frame2[idx]
     potvrd_ucet_def()
     print(vybraty_ucet)
-
+    stav_vybrateho_uctu=stav_uctu[int(vybraty_ucet)-1]
 
 def frame3():
     global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
@@ -253,7 +252,26 @@ def platobny_prikaz_def():
 
 def splatit():
     global dlh, splatene,suma2_entry,karty_list,kreditka,splatenie
+    subor = open('KARTY.txt','r+')
     splatene=suma2_entry.get()
+    print('stav uctu=' + stav_vybrateho_uctu)
+    print('zadane=' + splatene)
+    pocet_kariet = subor.readline().strip()
+    if float(stav_vybrateho_uctu) >= float(splatene):
+        for a in range(pocet_kariet):
+            riadok = subor.readline().strip()
+            if riadok[0] == vybrata_karta:
+                print('splatene')
+        subor.close()
+        subor_ = open('KARTY_.txt','w')
+        subor = open('KARTY.txt','r+')
+        for a in range(int(pocet_kariet)+1):
+            riadok = subor.readline().strip()
+            subor_.write(riadok+'\n')
+    else:
+        print('nesplatene')
+    
+    subor.close()
     splatka=True
     
 def karty_def():
@@ -297,12 +315,12 @@ def karty_def():
     prijmy_tf=False
 
 def vyber_karty_def(event):
-    global vybrata_karta
+    global vybrata_karta, dlh
     m = event.widget
     idx = int(m.curselection()[0])
     vybrata_karta=id_karty[idx]
-    print(id_karty)
-    print(idx, vybrata_karta)
+    dlh = dlh_karty[idx]
+    print(idx, vybrata_karta, dlh)
     
 def prijmy_def():
     global platobny_prikaz_tf, karty_tf,prijmy, prijmy_tf, prijmy_list,prihlasit_btn, suma,ID_entry,pocet_transakcii,krstne_meno,priezvisko,cislo_uctu, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
@@ -492,17 +510,17 @@ def kon_karty():
         lock_karty = True
 
 def citaj_karty():
-    global cisla_karty, typy_karty, dlh_karty, id_uctu_karty, id_karty
+    global cisla_karty, typy_karty, dlh_karty, id_uctu_karty, id_karty, pocet_kariet
     if not lock_karty:
         lock_subor = open('KARTY_LOCK.txt','w')
         subor = open('KARTY.txt','r')
-        pocet = int(subor.readline().strip())
+        pocet_kariet = int(subor.readline().strip())
         id_uctu_karty = []
         cisla_karty = []
         typy_karty = []
         dlh_karty = []
         id_karty = []
-        for r in range(pocet): 
+        for r in range(pocet_kariet): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
             id_uctu_karty.append(k[6])
