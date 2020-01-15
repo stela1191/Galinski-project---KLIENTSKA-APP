@@ -1,10 +1,10 @@
 21
-1;Jano;Mrkva;761201/1234
-2;Maroš;Klamár;880812/4453
-3;Jano;Zapotockarsky;010811/5532
-4;Dominik;Majdl;285230/0785
-5;František;Somarínar;441156/7200
-6;Romana;Kralovská;711474/2627
+1;Jano;Mrkva;1
+2;Maroš;Klamár;2
+3;Jano;Zapotockarsky;3
+4;Dominik;Majdl;4
+5;František;Somarínar;5
+6;Romana;Kra¾ovská;6
 7;Romana;Tralová;796900/3720
 8;Romana;Volnovièová;255227/1473
 9;Jano;Maroš;301391/0095
@@ -17,6 +17,6 @@
 16;Martin;Kolovský;631139/2449
 17;Jano;Rébus;162895/5535
 18;Jano;Estrálny;561923/1352
-19;Hurban;Roman;9467358/1269
-20;Marián;Rebrík;402912/3074
-21;Jano;Drobný;546137/2869
+19;Hurban;Roman;19
+20;Marián;Rebrík;20
+21;Jano;Drobný;21
