@@ -6,19 +6,20 @@ h=720
 w=1280
 
 # DOROBIT : - vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
+#           - GRAF pomer podla realnych udajov
+#           - Vybrat kartu pri splacani dlhu
 #           - Jednotne tlacidla
 #           - Platobny prikaz este nekomunikuje so suborom
+#           - Transakcie funguju zatial len na id klienta a nie na konkretny jeho ucet
 #           - Prijmy pri prihlasovani
 #           - Skus vysvietit ten ucet spolu
 # HOTOVE :  - Pismenka v transakciach
 #           - Prihlasenie cez enter
-#           - GRAF pomer podla realnych udajov
-#           - Transakcie funguju zatial len na id klienta a nie na konkretny jeho ucet
-#           - Vybrat kartu pri splacani dlhu
 # OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 # PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
 
+#TAKZE 13.1. som spravil vyberanie kariet, uz funguje ze ked na nich kliknes to berie z toho hodnotu, dalej som sa hlboko zamyslal nad tym ako budem robit ostatne veci :D
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
 can.pack()
@@ -148,16 +149,15 @@ def vyber_ucet_def(event):
     potvrd_ucet_def()
     print(vybraty_ucet)
     stav_vybrateho_uctu=stav_uctu[int(vybraty_ucet)-1]
+
 def frame3():
-    global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3,id_uctu,vybraty_ucet,id_uctu_transakcie, frame_2, okno,prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
+    global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
 
     vymaz_pravu_stranu()
     
     frame_2 = False
     
     bol_f3 = True
-
-    okno=False
     
     vymaz_pravu_stranu()
     vymaz_lavu_stranu()
@@ -184,8 +184,7 @@ def frame3():
     trans_list = tk.Listbox(root, font='Arial 15')
     trans_list.place(x=100,y=100,width=w-220,height=h-200)
     for i in range(pocet_transakcii):
-        if komu[i]==prihlaseny_ID or id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i]:
-        #if komu[i]==prihlaseny_ID:
+        if komu[i]==prihlaseny_ID:
             a=int(id_klienta_transakcie[i])
             trans_list.insert(cislo, cislo_uctu[a]+(150-len(suma))*' '+suma[i]+' €')
             trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
@@ -193,13 +192,11 @@ def frame3():
             celkova_suma+=int(suma[i])
             #print(celkova_suma)
             if (suma[i][0])=='-':
-                sucet_zapornych+=(-(int(suma[i])))
-                print('Sucet_zapornych:'+str(sucet_zapornych))
+                sucet_zapornych+=int(suma[i])
                 trans_list.itemconfig(cislo,{'fg': 'red'})
                 trans_list.itemconfig(cislo+1,{'fg': 'red'})
             if (suma[i][0])=='+':
                 sucet_kladnych+=int(suma[i])
-                print('Sucet_kladnych:'+str(sucet_kladnych))
                 trans_list.itemconfig(cislo,{'fg': 'green'})
                 trans_list.itemconfig(cislo+1,{'fg': 'green'})
             cislo+=3
@@ -208,39 +205,29 @@ def frame3():
         
     spat_btn = tk.Button(root,text='SPÄŤ',command=spat_def)
     spat_btn.place(width=200,height=25,x=100,y=60)
-    otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='active')
+
+    otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko)
     otvor_okienko.place(width=200,height=40,x=w-150,y=h-30)
 
-    
-
+#GRAF ESTE NEFUNGUJE
 def okienko():
-    global sucet_kladnych,sucet_zapornych,celkova_suma,plusova,minusova,zaporne,kladne,okno
-    okno=True
+    global sucet_kladnych,sucet_zapornych,celkova_suma
     newroot=tk.Tk()
-    newroot.geometry('410x410')
-    myCanvas = tk.Canvas(newroot, bg="white", height=400, width=400)
-    coord = 10, 10, 390, 390
-    if (sucet_zapornych*100)>0 or celkova_suma>0:
-        minusova=(sucet_zapornych*100)/celkova_suma
-        print('Minusova:'+str(minusova))
-        zaporne=(360/100)*(-(int(minusova)))
-        arc = myCanvas.create_arc(coord, start=0, extent=zaporne, fill="red")
-    if (sucet_kladnych)>0 or celkova_suma>0:
-        plusova=(sucet_kladnych*100)//celkova_suma
-        print('Plusova:'+str(plusova))
-        kladne=(360/100)*(-(int(plusova)))
-        arv2 = myCanvas.create_arc(coord, start=360, extent=360-kladne, fill="green")
-    if (sucet_zapornych*100)==0:
-        arc = myCanvas.create_arc(coord, start=0, extent=215, fill="green",outline='green')
-        arc = myCanvas.create_arc(coord, start=100, extent=260, fill="green",outline='green')
-    elif (sucet_kladnych*100)==0:
-        arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red",outline='red')
-        arc = myCanvas.create_arc(coord, start=100, extent=260, fill="red",outline='red')
+    newroot.geometry('310x310')
+    myCanvas = tk.Canvas(newroot, bg="white", height=300, width=300)
     
-    
+    minusova=sucet_zapornych//360
+    #print(minusova)
+    plusova=sucet_kladnych//360
+    #print(plusova)
+    coord = 10, 10, 300, 300
+    arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red")
+    arv2 = myCanvas.create_arc(coord, start=150, extent=215, fill="green")
+
     myCanvas.pack()
     root.mainloop()
-    
+
+
 def platobny_prikaz_def():
     global platobny_prikaz_tf, karty_tf, prijmy_tf, potvrdplatbu_btn, prijemca_entry, suma_entry
     vymaz_pravu_stranu()
@@ -265,15 +252,17 @@ def platobny_prikaz_def():
 
 
 def splatit():
-    global dlh, splatene,suma2_entry,karty_list,kreditka,splatenie
-    subor = open('KARTY.txt','r+')
+    global splatene,suma2_entry,karty_list,kreditka,splatenie
+    subor = open('KARTY.txt','r')
     splatene=suma2_entry.get()
     print('stav uctu=' + stav_vybrateho_uctu)
     print('zadane=' + splatene)
     pocet_kariet = subor.readline().strip()
-    if float(stav_vybrateho_uctu) >= float(splatene):
-        for a in range(pocet_kariet):
-            riadok = subor.readline().strip()
+    if float(stav_vybrateho_uctu) >= float(splatene) and float(splatene) <= float(dlh_vybratej_karty):
+        for a in range(int(pocet_kariet)):
+            riadok_ = subor.readline().strip()
+            riadok=riadok_.split(';')
+            print(riadok[0])
             if riadok[0] == vybrata_karta:
                 print('splatene')
         subor.close()
@@ -289,9 +278,11 @@ def splatit():
     splatka=True
     
 def karty_def():
-    global platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatka,splatdlh_btn, karty_list, id_uctu_karty,dlh_karty, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
+    global id_kariet_box, dlh_kariet_box, platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatka,splatdlh_btn, karty_list, id_uctu_karty,dlh_karty, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
     vymaz_pravu_stranu()
-    
+
+    id_kariet_box = []
+    dlh_kariet_box = []
     kon_karty()
     citaj_karty()
 
@@ -299,7 +290,7 @@ def karty_def():
     splatka=False
     poradie = 0
     for m in range(len(id_uctu_karty)):
-        if prihlaseny_ID == id_uctu_karty[m]:
+        if vybraty_ucet == id_uctu_karty[m]:
             poradie+=1
             if typy_karty[m] == 'D':
                 typ_k = 'DEBETNÁ KARTA '
@@ -310,7 +301,9 @@ def karty_def():
                     splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
                 else:
                     splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str((dlh_karty[m])-splatene))
-                
+            id_kariet_box.append(id_karty[m])
+            dlh_kariet_box.append(dlh_karty[m])
+            
     karty_list.place(x=w//2+65,y=200)
     karty_list.bind('<<ListboxSelect>>',vyber_karty_def)
     
@@ -328,13 +321,16 @@ def karty_def():
     platobny_prikaz_tf=False
     prijmy_tf=False
 
+    print(id_kariet_box)
+    print(dlh_kariet_box)
+    
 def vyber_karty_def(event):
-    global vybrata_karta, dlh
+    global vybrata_karta, dlh_vybratej_karty
     m = event.widget
     idx = int(m.curselection()[0])
-    vybrata_karta=id_karty[idx]
-    dlh = dlh_karty[idx]
-    print(idx, vybrata_karta, dlh)
+    vybrata_karta=id_kariet_box[idx]
+    dlh_vybratej_karty =dlh_kariet_box[idx]
+    print(idx, vybrata_karta, dlh_vybratej_karty)
     
 def prijmy_def():
     global platobny_prikaz_tf, karty_tf,prijmy, prijmy_tf, prijmy_list,prihlasit_btn, suma,ID_entry,pocet_transakcii,krstne_meno,priezvisko,cislo_uctu, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
@@ -589,12 +585,12 @@ def kon_transakcie_ucty():
 
 
 def citaj_transakcie_ucty():
-    global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu
+    global id_uctu, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu
     if not lock_transakcie_ucty:
         lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
         subor = open('TRANSAKCIE_UCTY.txt','r')
         pocet_transakcii = int(subor.readline().strip())
-        id_uctu_transakcie = []
+        id_uctu = []
         id_klienta_transakcie = []
         suma = []
         id_transakcie = []
@@ -602,7 +598,7 @@ def citaj_transakcie_ucty():
         for r in range(pocet_transakcii): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
-            id_uctu_transakcie.append(k[4])
+            id_uctu.append(k[4])
             id_klienta_transakcie.append(k[3])
             suma.append(k[5])
             id_transakcie.append(k[0])
