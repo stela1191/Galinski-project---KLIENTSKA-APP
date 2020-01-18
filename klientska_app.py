@@ -19,7 +19,6 @@ w=1280
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 # PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
 
-#TAKZE 13.1. som spravil vyberanie kariet, uz funguje ze ked na nich kliknes to berie z toho hodnotu, dalej som sa hlboko zamyslal nad tym ako budem robit ostatne veci :D
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
 can.pack()
@@ -252,7 +251,7 @@ def platobny_prikaz_def():
 
 
 def splatit():
-    global splatene,suma2_entry,karty_list,kreditka,splatenie
+    global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty
     subor = open('KARTY.txt','r')
     splatene=suma2_entry.get()
     print('stav uctu=' + stav_vybrateho_uctu)
@@ -262,7 +261,6 @@ def splatit():
         for a in range(int(pocet_kariet)):
             riadok_ = subor.readline().strip()
             riadok=riadok_.split(';')
-            print(riadok[0])
             if riadok[0] == vybrata_karta:
                 print('splatene')
         subor.close()
@@ -271,6 +269,31 @@ def splatit():
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
             subor_.write(riadok+'\n')
+            
+        subor.close()
+        subor_.close()
+        
+        subor_ = open('KARTY_.txt','r')
+        subor = open('KARTY.txt','w')
+        
+        for a in range(int(pocet_kariet)+1):
+            riadok = subor_.readline().strip()
+            if a == 0:
+                subor.write(riadok+'\n')
+            if a > 0:
+                if riadok[0] == vybrata_karta:
+                    r_ = riadok.split(';')
+                    dlh = str(float(dlh_vybratej_karty) - float(splatene))
+                    dlh_vybratej_karty = dlh
+                    r_[7]=dlh
+                    print(r_)
+                    riadok = ';'.join(r_)
+                    subor.write(riadok+'\n')
+                else:
+                    subor.write(riadok+'\n')
+        subor.close()
+        subor_.close()
+        karty_def()
     else:
         print('nesplatene')
     
