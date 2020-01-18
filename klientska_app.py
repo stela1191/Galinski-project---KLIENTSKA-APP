@@ -9,15 +9,16 @@ w=1280
 #           - GRAF pomer podla realnych udajov
 #           - Vybrat kartu pri splacani dlhu
 #           - Jednotne tlacidla
-#           - Platobny prikaz este nekomunikuje so suborom
-#           - Transakcie funguju zatial len na id klienta a nie na konkretny jeho ucet
-#           - Prijmy pri prihlasovani
-#           - Skus vysvietit ten ucet spolu
+#           - Platobny prikaz este nekomunikuje so suborom 
+#           - Transakcie funguju zatial len na id klienta a nie na konkretny jeho ucet - pouzi premennu vybraty_ucet / je to ID zakliknuteho uctu //Stefan
+#           - Prijmy pri prihlasovani - nechapem preco ale nejde to - skusme tam radsej dat na zaciatku logo banky a ked nieco vyberies tak zmizne //Stefan
+#           - Skus vysvietit ten ucet spolu - neviem jak to spravit... grafiku riesme ked tak nakoniec //Stefan
 # HOTOVE :  - Pismenka v transakciach
 #           - Prihlasenie cez enter
+#           - Splatenie dlhu na karte #NEW#
 # OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
-# PROBLEM : - Pri menach s ˇ a ´ je problém pri citani aj ked zmenim font
+
 
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
@@ -251,7 +252,7 @@ def platobny_prikaz_def():
 
 
 def splatit():
-    global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty
+    global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty,stav_vybrateho_uctu
     subor = open('KARTY.txt','r')
     splatene=suma2_entry.get()
     print('stav uctu=' + stav_vybrateho_uctu)
@@ -268,31 +269,69 @@ def splatit():
         subor = open('KARTY.txt','r+')
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
-            subor_.write(riadok+'\n')
-            
+            subor_.write(riadok+'\n')   
         subor.close()
         subor_.close()
         
         subor_ = open('KARTY_.txt','r')
         subor = open('KARTY.txt','w')
-        
         for a in range(int(pocet_kariet)+1):
             riadok = subor_.readline().strip()
             if a == 0:
                 subor.write(riadok+'\n')
+            riadok_split=riadok.split(';')
             if a > 0:
-                if riadok[0] == vybrata_karta:
+                if riadok_split[0] == vybrata_karta:
                     r_ = riadok.split(';')
                     dlh = str(float(dlh_vybratej_karty) - float(splatene))
                     dlh_vybratej_karty = dlh
                     r_[7]=dlh
-                    print(r_)
+                    print(dlh)
                     riadok = ';'.join(r_)
                     subor.write(riadok+'\n')
                 else:
                     subor.write(riadok+'\n')
         subor.close()
         subor_.close()
+        
+        subor = open('UCTY.txt','r')
+        subor_ = open('UCTY_.txt','w')
+        riadok = subor.readline().strip()
+        subor_.write(riadok+'\n')
+        print('PU:'+str(riadok))
+        pocet = int(riadok) 
+        for a in range(pocet):
+            riadokk = subor.readline().strip()
+            subor_.write(riadokk+'\n')
+        subor.close()
+        subor_.close()
+
+        suboris = open('UCTY.txt','w')
+        suboris_ = open('UCTY_.txt','r')
+
+        for a in range(pocet_uctov+1):
+            riadocek = suboris_.readline().strip()     
+            if a == 0:
+                suboris.write(riadok+'\n')
+            
+            if a > 0:
+                riadocek_split = riadocek.split(';')
+                if vybraty_ucet == riadocek_split[0]:
+                    r_=riadocek.split(';')
+                    r_[4] = str(float(stav_vybrateho_uctu) - float(splatene))
+                    stav_vybrateho_uctu = r_[4]
+                    print('nasiel sa ucet', 'stav noveho: ' + r_[4])
+                    riadok = ';'.join(r_)
+                    suboris.write(riadok+'\n')
+                else:
+                    suboris.write(riadocek+'\n')
+        suboris.close()
+        suboris_.close()
+
+        os.remove("UCTY_.txt")
+        #os.remove("KARTY_.txt")
+        
+        frame2()
         karty_def()
     else:
         print('nesplatene')
