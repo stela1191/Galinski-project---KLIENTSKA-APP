@@ -11,10 +11,11 @@ w=1280
 #           - GRAF este nejde stopercentne kvoli tej premene sinusu na stupne, nevymaz tu dolnu podmienku, ak by si videl, ked budes mat cas mozes pozriet chybu//Christi
 #           - Jednotne tlacidla
 #           - Platobny prikaz este nekomunikuje so suborom tam ten zapis musime domysliet
-#           - Skus vysvietit ten ucet spolu - neviem jak to spravit... grafiku riesme ked tak nakoniec //Stefan
+#           - Skus vysvietit ten ucet spolu - neviem jak to spravit... grafiku riesme ked tak nakoniec 
 #             Ono to nejde kvoli tomu ze je tam v tom idx len jedna pozicia ale ak ju zmeni tak to nejde takze neviem ako to vysvietime lebo aj ked tam dam to '\n' tak to nejde
 # HOTOVE :  - Obrazok po prihlaseni #NEW#
 #           - Splatenie dlhu na karte #NEW#
+#           - Nove okienko nejde otvorit ked je otvorene #NEW
 # OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 
@@ -158,7 +159,7 @@ def vyber_ucet_def(event):
     stav_vybrateho_uctu=stav_uctu[int(vybraty_ucet)-1]
 
 def frame3():
-    global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, id_uctu,vybraty_ucet,id_uctu_transakcie,prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
+    global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, id_uctu,vybraty_ucet,okno,id_uctu_transakcie,prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
 
     vymaz_pravu_stranu()
     
@@ -207,14 +208,17 @@ def frame3():
                 trans_list.itemconfig(cislo,{'fg': 'green'})
                 trans_list.itemconfig(cislo+1,{'fg': 'green'})
             cislo+=3
+            print(celkova_suma)
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
         
     spat_btn = tk.Button(root,text='SPÄŤ',command=spat_def)
     spat_btn.place(width=200,height=25,x=100,y=60)
+    okno=False
+    if okno==False:
+        otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='active')
+        otvor_okienko.place(width=200,height=40,x=w-150,y=h-30)
 
-    otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko)
-    otvor_okienko.place(width=200,height=40,x=w-150,y=h-30)
 
 def okienko():
     global sucet_kladnych,sucet_zapornych,celkova_suma,plusova,minusova,zaporne,kladne,okno
@@ -250,6 +254,9 @@ def okienko():
     elif (sucet_kladnych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red",outline='red')
         arc = myCanvas.create_arc(coord, start=100, extent=260, fill="red",outline='red')
+    otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='disabled')
+    otvor_okienko.place(width=200,height=40,x=w-150,y=h-30)
+
     
     
     myCanvas.pack()
@@ -257,7 +264,7 @@ def okienko():
 
 
 def platobny_prikaz_def():
-    global platobny_prikaz_tf, karty_tf, prijmy_tf, potvrdplatbu_btn, prijemca_entry, suma_entry, cislo_uctu,pocet_uctov, pocet_transakcii
+    global platobny_prikaz_tf, karty_tf, prijmy_tf, potvrdplatbu_btn, prijemca_entry, suma_entry, cislo_uctu,pocet_uctov, pocet_transakcii,stav_vybrateho_uctu, typy_karty,prihlaseny_ID,uctovnyDen
     vymaz_pravu_stranu()
     labelMenuImg.destroy()
 
@@ -277,12 +284,19 @@ def platobny_prikaz_def():
     
     can.create_text(w//2+255,190,text='Prijemca')
     can.create_text(w//2+255,260,text='Suma')
-##    subor_transakcie=open('TRANSAKCIE_UCTY.txt','a')
-##    for p in range(pocet_uctov):
-##        if prijemca_entry==cislo_uctu[p]:
-##            subor_transakcie.write(str(pocet_transakcie+1)+
- 
-    subor.close()        
+    subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
+    subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
+
+##    if str(stav_vybrateho_uctu)>=str(suma_entry.get()):
+##        while riadok!='':
+##            riadok = subor_transakcie.readline().strip()
+##            riadok_NEW = riadok.split(';')
+##            subor_transakcie_NEW.write(riadok+'\n')
+##            for i in range():
+##                subor_transakcie_NEW.write()+i)+(uctovnyDen))
+##            
+    subor_transakcie.close()
+    subor_transakcie_NEW.close()
     karty_tf=False
     platobny_prikaz_tf=True
     prijmy_tf=False
@@ -466,7 +480,7 @@ def login_cez_enter(sur):
     prihlas()
     
 def login():
-    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene, frame_2, vybraty_ucet
+    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene, frame_2, vybraty_ucet,uctovnyDen
 
     vybraty_ucet = ''
 
