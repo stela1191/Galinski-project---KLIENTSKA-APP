@@ -8,8 +8,7 @@ h=720
 w=1280
 
 # DOROBIT : - vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
-#           - GRAF pomer podla realnych udajov skus sa na to pozriet prosim lebo ako skusam, tak skusam asi nevidim preco to nejde nevymaz tu dolnu podmienku
-#           to je ked su len kladne a len zaporne to funguje, ale ten pomer nie//Christi
+#           - GRAF este nejde stopercentne kvoli tej premene sinusu na stupne, nevymaz tu dolnu podmienku, ak by si videl, ked budes mat cas mozes pozriet chybu//Christi
 #           - Jednotne tlacidla
 #           - Platobny prikaz este nekomunikuje so suborom tam ten zapis musime domysliet
 #           - Skus vysvietit ten ucet spolu - neviem jak to spravit... grafiku riesme ked tak nakoniec //Stefan
@@ -63,8 +62,9 @@ def frame2():
     
     can.create_text(w//2-255,150,text='ÚČTY',font='Arial 25')
     can.create_text(w//2-255,300,text='zostatok na ucte: 1234$6',font='Arial 20')
-    
+   
     ucty_list = tk.Listbox(root, width=43, height = 8, font='Arial 11', xscrollcommand=True)
+  
     poradie = 0
     id_uctov_frame2 = []
     for l in range(pocet_uctov-1):#poradie uctov pridat
@@ -155,7 +155,6 @@ def vyber_ucet_def(event):
     vybraty_ucet=id_uctov_frame2[idx]
     potvrd_ucet_def()
     print(vybraty_ucet)
-    ucty_list.MultiSelect = id_uctov_frame2[idx]
     stav_vybrateho_uctu=stav_uctu[int(vybraty_ucet)-1]
 
 def frame3():
@@ -224,20 +223,26 @@ def okienko():
     newroot.geometry('410x410')
     myCanvas = tk.Canvas(newroot, bg="white", height=400, width=400)
     coord = 10, 10, 390, 390
-    #arc = myCanvas.create_arc(coord, start=0, extent=360-(math.asin((celkova_suma)/(sucet_zapornych))*(360/100)), fill="red")
     arc = myCanvas.create_arc(coord, start=0, extent=(math.asin(celkova_suma//sucet_zapornych)), fill="red")
     arv2 = myCanvas.create_arc(coord, start=180, extent=(math.asin(celkova_suma//sucet_kladnych)), fill="green")
-    #arv2 = myCanvas.create_arc(coord, start=0, extent=360-(math.asin((celkova_suma)/(sucet_kladnych))*(360/100)), fill="green")
-##    if (sucet_zapornych*100)>0 or celkova_suma>0:
-##        minusova=(sucet_zapornych*100)/celkova_suma
-##        print('Minusova:'+str(minusova))
-##        zaporne=(360/100)*(-(int(minusova)))
-##        arc = myCanvas.create_arc(coord, start=0, extent=math.sin(zaporne), fill="red")
-##    if (sucet_kladnych)>0 or celkova_suma>0:
-##        plusova=(sucet_kladnych*100)//celkova_suma
-##        print('Plusova:'+str(plusova))
-##        kladne=(360/100)*(-(int(plusova)))
-##        arv2 = myCanvas.create_arc(coord, start=0, extent=math.sin(kladne), fill="green")
+    if (sucet_zapornych*100)!=0 or celkova_suma!=0:
+        minusova=(sucet_zapornych*100)/celkova_suma
+        print('Minusova:'+str(minusova))
+        zaporne=(360/100)*(-(int(minusova)))
+        sinus1=math.sin(celkova_suma-zaporne)
+        print(sinus1)
+        sinus_stupne_z=math.degrees(sinus1)*(math.pi)
+        print(sinus_stupne_z)
+        arc = myCanvas.create_arc(coord, start=0, extent=360-(sinus_stupne_z), fill="red")
+    if (sucet_kladnych)!=0 or celkova_suma!=0:
+        plusova=(sucet_kladnych*100)//celkova_suma
+        print('Plusova:'+str(plusova))
+        kladne=(360/100)*(-(int(plusova)))
+        sinus2=math.sin(celkova_suma-kladne)
+        print(sinus2)
+        sinus_stupne_k=math.degrees(sinus2)*(math.pi)
+        print(sinus_stupne_k)
+        arv2 = myCanvas.create_arc(coord, start=360-(sinus_stupne_z), extent=-sinus_stupne_k, fill="green")
         
     if (sucet_zapornych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=215, fill="green",outline='green')
@@ -276,8 +281,7 @@ def platobny_prikaz_def():
 ##    for p in range(pocet_uctov):
 ##        if prijemca_entry==cislo_uctu[p]:
 ##            subor_transakcie.write(str(pocet_transakcie+1)+
-##        
-##    
+ 
     subor.close()        
     karty_tf=False
     platobny_prikaz_tf=True
