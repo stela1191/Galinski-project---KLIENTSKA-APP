@@ -68,7 +68,7 @@ def frame2():
   
     poradie = 0
     id_uctov_frame2 = []
-    for l in range(pocet_uctov-1):#poradie uctov pridat
+    for l in range((pocet_uctov)-1):#poradie uctov pridat
         if prihlaseny_ID == id_klienta_ucty[l]:
             poradie+=1
             if typ_uctu[l] == 'P':
@@ -610,8 +610,8 @@ def kon_klienti():
 def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
-        lock_subor = open('KLIENTI_LOCK.txt','w')
-        subor = open('KLIENTI.txt','r',encoding='utf-8')
+##        lock_subor = open('KLIENTI_LOCK.txt','w')
+        subor = open('KLIENTI.txt','r')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
         priezvisko=[]
@@ -623,8 +623,8 @@ def citaj_klientov():
             krstne_meno.append(k[1])
             priezvisko.append(k[2])
         subor.close()
-        lock_subor.close()
-        os.remove("KLIENTI_LOCK.txt")
+        #lock_subor.close()
+        #os.remove("KLIENTI_LOCK.txt")
     else:
         pocet=0
 
@@ -680,7 +680,7 @@ def citaj_ucty():
         typ_uctu = []
         stav_uctu = []
         id_uctu = []
-        for r in range(pocet): 
+        for r in range(pocet_uctov): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
             id_uctu.append(k[0])
