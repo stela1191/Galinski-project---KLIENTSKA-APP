@@ -13,9 +13,9 @@ w=1280
 #           - Platobny prikaz este nekomunikuje so suborom tam ten zapis musime domysliet
 #           - Skus vysvietit ten ucet spolu - neviem jak to spravit... grafiku riesme ked tak nakoniec 
 #             Ono to nejde kvoli tomu ze je tam v tom idx len jedna pozicia ale ak ju zmeni tak to nejde takze neviem ako to vysvietime lebo aj ked tam dam to '\n' tak to nejde
-# HOTOVE :  - Obrazok po prihlaseni #NEW#
-#           - Splatenie dlhu na karte #NEW#
-#           - Nove okienko nejde otvorit ked je otvorene #NEW
+# HOTOVE :  - Obrazok po prihlaseni 
+#           - Splatenie dlhu na karte
+#           - Nove okienko nejde otvorit ked je otvorene 
 # OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
 #           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
 
@@ -78,23 +78,22 @@ def frame2():
             ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €')
             ucty_list.insert(poradie*2, str(cislo_uctu[l]) )
             id_uctov_frame2.append(id_uctu[l])
-
-   # prijmy_def() TEORETICKY BY TO MOHLO BYT UZ NA ZACIATKU ZOBRAZENE      
+   
     ucty_list.bind('<<ListboxSelect>>',vyber_ucet_def)
     ucty_list.place(x=w//2-425,y=200)
 
     if vybraty_ucet == '':
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
-        transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
+        transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
         platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='disabled')
-        platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
+        platprik_btn.place(width=200,height=35,x=w//2-355,y=420)
         
         prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='disabled')
-        prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
+        prijmy_btn.place(width=200,height=35,x=w//2-355,y=465)
         
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='disabled')
-        karty_btn.place(width=200,height=25,x=w//2-355,y=530)
+        karty_btn.place(width=200,height=35,x=w//2-355,y=510)
         
         menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
     
@@ -103,21 +102,22 @@ def frame2():
         labelMenuImg.pack()
         labelMenuImg.place(x=0.45*w,y=h-(0.50*h), anchor="w")
     else:
-        labelMenuImg.destroy()
+##        labelMenuImg.destroy()
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='active')
-        transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
+        transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
         platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='active')
-        platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
+        platprik_btn.place(width=200,height=35,x=w//2-355,y=420)
         
         prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='active')
-        prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
+        prijmy_btn.place(width=200,height=35,x=w//2-355,y=465)
         
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
-        karty_btn.place(width=200,height=25,x=w//2-355,y=530)
+        karty_btn.place(width=200,height=35,x=w//2-355,y=510)
+        
     if z_loginu:
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
-        odhlasenie_btn.place(width=100,height=25,x=w-150,y=20)
+        odhlasenie_btn.place(width=100,height=25,x=w-200,y=20)
     z_loginu=False
 
 ##    prijmy_def()     TOTO NEJDE NECHAPEM PRECO... ked to pustim tak sa zacykluje shell
@@ -127,19 +127,19 @@ def potvrd_ucet_def():
     if vybraty_ucet != '':
         transakcia_btn.destroy()
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='active')
-        transakcia_btn.place(width=200,height=25,x=w//2-355,y=410)
+        transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
         platprik_btn.destroy()
         platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='active')
-        platprik_btn.place(width=200,height=25,x=w//2-355,y=450)
+        platprik_btn.place(width=200,height=35,x=w//2-355,y=420)
         
         prijmy_btn.destroy()
         prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='active')
-        prijmy_btn.place(width=200,height=25,x=w//2-355,y=490)
+        prijmy_btn.place(width=200,height=35,x=w//2-355,y=465)
         
         karty_btn.destroy()
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
-        karty_btn.place(width=200,height=25,x=w//2-355,y=530)
+        karty_btn.place(width=200,height=35,x=w//2-355,y=510)
 
         
 def vyber_ucet_def(event):
@@ -170,13 +170,12 @@ def frame3():
     vymaz_pravu_stranu()
     vymaz_lavu_stranu()
 
-    kon_transakcie_ucty()
-    citaj_transakcie_ucty()
-
+    kon_transakcie_ucty() #mensie zmeny v poradi kvoli LOCKU (najprv to skontroluje ci to moze pokracovat, ci nikde nie je lock)
     kon_ucty()
-    citaj_ucty()
-    
     kon_klienti()
+    
+    citaj_transakcie_ucty()
+    citaj_ucty()
     citaj_klientov()
     
     round_rectangle(50, 50, w-50, h-50, radius=50,color='#71CAE7', outline='black',width=3)
@@ -217,7 +216,7 @@ def frame3():
     okno=False
     if okno==False:
         otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='active')
-        otvor_okienko.place(width=200,height=40,x=w-150,y=h-30)
+        otvor_okienko.place(width=200,height=40,x=w-300,y=h-95)
 
 
 def okienko():
@@ -380,7 +379,7 @@ def splatit():
         suboris_.close()
 
         os.remove("UCTY_.txt")
-        #os.remove("KARTY_.txt")
+        os.remove("KARTY_.txt")
         
         frame2()
         karty_def()
@@ -610,7 +609,7 @@ def kon_klienti():
 def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
-##        lock_subor = open('KLIENTI_LOCK.txt','w')
+        lock_subor = open('KLIENTI_LOCK.txt','w')
         subor = open('KLIENTI.txt','r')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
@@ -623,8 +622,8 @@ def citaj_klientov():
             krstne_meno.append(k[1])
             priezvisko.append(k[2])
         subor.close()
-        #lock_subor.close()
-        #os.remove("KLIENTI_LOCK.txt")
+        lock_subor.close()
+        os.remove("KLIENTI_LOCK.txt")
     else:
         pocet=0
 
@@ -703,6 +702,7 @@ def kon_transakcie_ucty():
 def citaj_transakcie_ucty():
     global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu
     if not lock_transakcie_ucty:
+##        can.delete('lock_tran_ucty_oznam')
         lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
         subor = open('TRANSAKCIE_UCTY.txt','r')
         pocet_transakcii = int(subor.readline().strip())
@@ -722,6 +722,8 @@ def citaj_transakcie_ucty():
         subor.close()
         lock_subor.close()
         os.remove("TRANSAKCIE_UCTY_LOCK.txt")
+##    else:
+##        can.create_text(1/2*w + 425,h-(0.62*h)+85, text='Prebieha audit, počkajte prosim',fill='red',font='Arial 15', tags='lock_tran_ucty_oznam')
 
         
 ##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
