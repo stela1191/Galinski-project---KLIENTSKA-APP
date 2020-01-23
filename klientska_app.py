@@ -52,13 +52,17 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
     return can.create_polygon(points, **kwargs, smooth=True,fill=color)
 
 def frame2():
-    global prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
-    
+    global frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
+
     frame_2=True
     
+    frame_3=False
+    login_tf=False
     kon_ucty()
-    citaj_ucty()
-    
+
+    if not lock_ucty:
+        citaj_ucty()
+        
     round_rectangle(100, 100, w-100, h-100, radius=50,color='#71CAE7', outline='black',width=3)
     
     can.create_text(w//2-255,150,text='ÚČTY',font='Arial 25')
@@ -68,17 +72,19 @@ def frame2():
   
     poradie = 0
     id_uctov_frame2 = []
-    for l in range((pocet_uctov)-1):#poradie uctov pridat
-        if prihlaseny_ID == id_klienta_ucty[l]:
-            poradie+=1
-            if typ_uctu[l] == 'P':
-                typ_u = 'SÚKROMNÝ ÚČET '
-            else:
-                typ_u = 'OBCHODNÝ ÚČET '
-            ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €')
-            ucty_list.insert(poradie*2, str(cislo_uctu[l]) )
-            id_uctov_frame2.append(id_uctu[l])
-   
+    
+    if not lock_ucty:
+        for l in range((pocet_uctov)-1):#poradie uctov pridat
+            if prihlaseny_ID == id_klienta_ucty[l]:
+                poradie+=1
+                if typ_uctu[l] == 'P':
+                    typ_u = 'SÚKROMNÝ ÚČET '
+                else:
+                    typ_u = 'OBCHODNÝ ÚČET '
+                ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €')
+                ucty_list.insert(poradie*2, str(cislo_uctu[l]) )
+                id_uctov_frame2.append(id_uctu[l])
+       
     ucty_list.bind('<<ListboxSelect>>',vyber_ucet_def)
     ucty_list.place(x=w//2-425,y=200)
 
@@ -96,13 +102,13 @@ def frame2():
         karty_btn.place(width=200,height=35,x=w//2-355,y=510)
         
         menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
-    
-        labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
-        labelMenuImgimage = menuImg
-        labelMenuImg.pack()
-        labelMenuImg.place(x=0.45*w,y=h-(0.50*h), anchor="w")
+        if not bol_lock_ucty:
+            labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
+            labelMenuImgimage = menuImg
+            labelMenuImg.pack()
+            labelMenuImg.place(x=0.45*w,y=h-(0.50*h), anchor="w")
     else:
-##        labelMenuImg.destroy()
+        labelMenuImg.destroy()
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='active')
         transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
@@ -121,6 +127,32 @@ def frame2():
     z_loginu=False
 
 ##    prijmy_def()     TOTO NEJDE NECHAPEM PRECO... ked to pustim tak sa zacykluje shell
+    if not bol_lock_ucty:
+        ucty_lock_frame2()
+
+def ucty_lock_frame2():
+    global bol_lock_ucty, vybraty_ucet
+    kon_ucty()
+    if lock_ucty:
+        vybraty_ucet == ''
+        if frame_3:
+            spat_def()
+        print('nasiel som', lock_ucty, bol_lock_ucty)
+        if frame_2:
+            if not bol_lock_ucty:
+                bol_lock_ucty = True
+                vymaz_lavu_stranu()
+                vymaz_pravu_stranu()
+                frame2()
+        bol_lock_ucty = True
+    elif not lock_ucty:
+        if bol_lock_ucty:
+            bol_lock_ucty = False
+            frame2()  
+        bol_lock_ucty = False
+    if not login_tf:
+        print('kontrolujem')
+        can.after(2000, ucty_lock_frame2)
     
 def potvrd_ucet_def():
     global transakcia_btn, platprik_btn, prijmy_btn, karty_btn, vyber_ucet_btn
@@ -159,11 +191,12 @@ def vyber_ucet_def(event):
     stav_vybrateho_uctu=stav_uctu[int(vybraty_ucet)-1]
 
 def frame3():
-    global scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, id_uctu,vybraty_ucet,okno,id_uctu_transakcie,prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
+    global frame_3, scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, id_uctu,vybraty_ucet,okno,id_uctu_transakcie,prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
 
     vymaz_pravu_stranu()
     
     frame_2 = False
+    frame_3 = True
     
     bol_f3 = True
     
@@ -217,6 +250,7 @@ def frame3():
     if okno==False:
         otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='active')
         otvor_okienko.place(width=200,height=40,x=w-300,y=h-95)
+
 
 
 def okienko():
@@ -479,11 +513,13 @@ def login_cez_enter(sur):
     prihlas()
     
 def login():
-    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene, frame_2, vybraty_ucet,uctovnyDen
+    global frame_3, login_tf, w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg,prihlasit_btn, ID_entry, PW_entry, labelMenuImg, odhlasenie_btn, z_loginu, prihlasene, frame_2, vybraty_ucet,uctovnyDen
 
     vybraty_ucet = ''
 
     frame_2 = False
+    frame_3 = False
+    login_tf = True
     
     can.create_rectangle(0,0,w,h,fill='#71CAE7')
     uctovnyDen = datetime.datetime.now()
@@ -727,6 +763,7 @@ def citaj_transakcie_ucty():
 
         
 ##////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bol_lock_ucty = False
 prihlaseny_ID = 1
 lock_ucty=False
 ID_klientov=[]
