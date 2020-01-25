@@ -226,13 +226,15 @@ def frame3():
     for i in range(pocet_transakcii):
         if komu[i]==prihlaseny_ID or id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i]:
             a=int(id_klienta_transakcie[i])
-            trans_list.insert(cislo, cislo_uctu[a]+(150-len(suma))*' '+suma[i]+' €')
+            trans_list.insert(cislo, cislo_uctu[a]+(140-len(suma))*' '+suma[i]+' €')
             trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
             trans_list.insert(cislo+2, '')
-            celkova_suma+=int(suma[i])
-            #print(celkova_suma)
+            if int(suma[i])>0:
+                celkova_suma+=int(suma[i])
+            elif int(suma[i])<0:
+                celkova_suma-=int(suma[i])
             if (suma[i][0])=='-':
-                sucet_zapornych+=int(suma[i])
+                sucet_zapornych-=int(suma[i])
                 trans_list.itemconfig(cislo,{'fg': 'red'})
                 trans_list.itemconfig(cislo+1,{'fg': 'red'})
             if (suma[i][0])=='+':
@@ -241,6 +243,7 @@ def frame3():
                 trans_list.itemconfig(cislo+1,{'fg': 'green'})
             cislo+=3
             print(celkova_suma)
+            
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
         
@@ -252,7 +255,6 @@ def frame3():
         otvor_okienko.place(width=200,height=40,x=w-300,y=h-95)
 
 
-
 def okienko():
     global sucet_kladnych,sucet_zapornych,celkova_suma,plusova,minusova,zaporne,kladne,okno
     okno=True
@@ -260,38 +262,31 @@ def okienko():
     newroot.geometry('410x410')
     myCanvas = tk.Canvas(newroot, bg="white", height=400, width=400)
     coord = 10, 10, 390, 390
-    arc = myCanvas.create_arc(coord, start=0, extent=(math.asin(celkova_suma//sucet_zapornych)), fill="red")
-    arv2 = myCanvas.create_arc(coord, start=180, extent=(math.asin(celkova_suma//sucet_kladnych)), fill="green")
+    percento_kladne=(sucet_kladnych*100)/celkova_suma
+    print(percento_kladne)
+    uhol_kladne=360*(percento_kladne)/100
+    print(uhol_kladne)
+    percento_zaporne=(sucet_zapornych*100)/celkova_suma
+    print(percento_zaporne)
+    uhol_zaporne=360*(percento_zaporne)/100
+    print(uhol_zaporne)
     if (sucet_zapornych*100)!=0 or celkova_suma!=0:
-        minusova=(sucet_zapornych*100)/celkova_suma
-        print('Minusova:'+str(minusova))
-        zaporne=(360/100)*(-(int(minusova)))
-        sinus1=math.sin(celkova_suma-zaporne)
-        print(sinus1)
-        sinus_stupne_z=math.degrees(sinus1)*(math.pi)
-        print(sinus_stupne_z)
-        arc = myCanvas.create_arc(coord, start=0, extent=360-(sinus_stupne_z), fill="red")
-    if (sucet_kladnych)!=0 or celkova_suma!=0:
-        plusova=(sucet_kladnych*100)//celkova_suma
-        print('Plusova:'+str(plusova))
-        kladne=(360/100)*(-(int(plusova)))
-        sinus2=math.sin(celkova_suma-kladne)
-        print(sinus2)
-        sinus_stupne_k=math.degrees(sinus2)*(math.pi)
-        print(sinus_stupne_k)
-        arv2 = myCanvas.create_arc(coord, start=360-(sinus_stupne_z), extent=-sinus_stupne_k, fill="green")
-        
+        arc = myCanvas.create_arc(coord, start=0, extent=uhol_zaporne, fill="red")
+        arv2 = myCanvas.create_arc(coord, start=uhol_zaporne, extent=uhol_kladne, fill="green")
+        myCanvas.create_text(250,100,text=str(sucet_zapornych)+' €',fill='white',font='Arial 15')
+        myCanvas.create_text(250,300,text=str(sucet_kladnych)+' €',fill='white',font='Arial 15')
+
     if (sucet_zapornych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=215, fill="green",outline='green')
+        myCanvas.create_text(200,200,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
         arc = myCanvas.create_arc(coord, start=100, extent=260, fill="green",outline='green')
     elif (sucet_kladnych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red",outline='red')
+        myCanvas.create_text(200,200,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
         arc = myCanvas.create_arc(coord, start=100, extent=260, fill="red",outline='red')
     otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='disabled')
     otvor_okienko.place(width=200,height=40,x=w-150,y=h-30)
 
-    
-    
     myCanvas.pack()
     root.mainloop()
 
@@ -306,7 +301,7 @@ def platobny_prikaz_def():
 
     can.create_text(w//2+255,150,text='PLATOBNY PRIKAZ',font='Arial 25')
     
-    potvrdplatbu_btn=tk.Button(root,text='potvrdit platbu',command=frame2)
+    potvrdplatbu_btn=tk.Button(root,text='potvrdit platbu',command=sprav_platobny_prikaz)
     potvrdplatbu_btn.place(width=200,height=25,x=w//2+155,y=340)
     
     prijemca_entry = tk.Entry(root)
@@ -317,24 +312,38 @@ def platobny_prikaz_def():
     
     can.create_text(w//2+255,190,text='Prijemca')
     can.create_text(w//2+255,260,text='Suma')
-    subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
-    subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
-
-##    if str(stav_vybrateho_uctu)>=str(suma_entry.get()):
-##        while riadok!='':
-##            riadok = subor_transakcie.readline().strip()
-##            riadok_NEW = riadok.split(';')
-##            subor_transakcie_NEW.write(riadok+'\n')
-##            for i in range():
-##                subor_transakcie_NEW.write()+i)+(uctovnyDen))
-##            
-    subor_transakcie.close()
-    subor_transakcie_NEW.close()
+    
     karty_tf=False
     platobny_prikaz_tf=True
     prijmy_tf=False
 
-
+def sprav_platobny_prikaz():
+    global stva_vybrateho_uctu, suma_entry, prijemca_entry
+    subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
+    subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
+    subor_ucty=open('UCTY.txt','r')
+    datum = datetime.date.today().strftime('%d%m%Y')
+    poradie=(subor_transakcie.readline().strip())
+    print(datum)
+    print(stav_vybrateho_uctu)
+    print(suma_entry.get())
+    print(prijemca_entry.get())
+    cislo_uctu= []
+    pocet_uctov=int(subor_ucty.readline().strip())
+    for u in range(pocet_uctov):
+        riadok = subor_ucty.readline().strip()
+        k=riadok.split(';')
+        cislo_uctu.append(k[2])
+        if (stav_vybrateho_uctu)>=(suma_entry.get()) and cislo_uctu[u]==prijemca_entry.get():
+            #poradie+=1
+            print('Moze prebehnut')
+    subor_transakcie.close()
+    subor_transakcie_NEW.close()
+    subor_ucty.close()
+    
+    #potvrdplatbu_btn=tk.Button(root,text='potvrdit platbu',command=platobny_prikaz_def)
+    #potvrdplatbu_btn.place(width=200,height=25,x=w//2+155,y=340)
+    
 def splatit():
     global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty,stav_vybrateho_uctu
     subor = open('KARTY.txt','r')
@@ -646,7 +655,7 @@ def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
         lock_subor = open('KLIENTI_LOCK.txt','w')
-        subor = open('KLIENTI.txt','r')
+        subor = open('KLIENTI.txt','r',encoding='utf-8')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
         priezvisko=[]
