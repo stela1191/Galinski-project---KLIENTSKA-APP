@@ -8,16 +8,14 @@ h=720
 w=1280
 
 # DOROBIT : - vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
-#           - GRAF este nejde stopercentne kvoli tej premene sinusu na stupne, nevymaz tu dolnu podmienku, ak by si videl, ked budes mat cas mozes pozriet chybu//Christi
-#           - Jednotne tlacidla
-#           - Platobny prikaz este nekomunikuje so suborom tam ten zapis musime domysliet
-#           - Skus vysvietit ten ucet spolu - neviem jak to spravit... grafiku riesme ked tak nakoniec 
-#             Ono to nejde kvoli tomu ze je tam v tom idx len jedna pozicia ale ak ju zmeni tak to nejde takze neviem ako to vysvietime lebo aj ked tam dam to '\n' tak to nejde
-# HOTOVE :  - Obrazok po prihlaseni 
-#           - Splatenie dlhu na karte
-#           - Nove okienko nejde otvorit ked je otvorene 
-# OTAZKY :  - Nechceme zobrazovat tie prijmy uz hned pri nacitani frame2
-#           - A ci chceme pri prijmoch zobrazovat aj kladne transakcie z kariet
+#           - vysvietit naraz
+#           - Platobny prikaz zapisovanie suboru skoro hotove
+#           - Grafiku
+#           - Transakcie ucty pridat zplatenie kreditnej karty
+# HOTOVE :  - Platobny prikaz je pripraveny
+#           - Graf
+# OTAZKY :  - Neviem ako rozlisime pri zapisovani prijmu ci je to z kreditnej alebo debetnej karty
+
 
 
 root = tk.Tk()
@@ -123,7 +121,7 @@ def frame2():
         
     if z_loginu:
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
-        odhlasenie_btn.place(width=100,height=25,x=w-200,y=20)
+        odhlasenie_btn.place(width=100,height=35,x=w-200,y=10)
     z_loginu=False
 
 ##    prijmy_def()     TOTO NEJDE NECHAPEM PRECO... ked to pustim tak sa zacykluje shell
@@ -248,11 +246,11 @@ def frame3():
     scrollbar.config(command=trans_list.yview)
         
     spat_btn = tk.Button(root,text='SPÄŤ',command=spat_def)
-    spat_btn.place(width=200,height=25,x=100,y=60)
+    spat_btn.place(width=200,height=35,x=100,y=10)
     okno=False
     if okno==False:
         otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='active')
-        otvor_okienko.place(width=200,height=40,x=w-300,y=h-95)
+        otvor_okienko.place(width=200,height=35,x=w-300,y=h-95)
 
 
 def okienko():
@@ -301,14 +299,14 @@ def platobny_prikaz_def():
 
     can.create_text(w//2+255,150,text='PLATOBNY PRIKAZ',font='Arial 25')
     
-    potvrdplatbu_btn=tk.Button(root,text='potvrdit platbu',command=sprav_platobny_prikaz)
-    potvrdplatbu_btn.place(width=200,height=25,x=w//2+155,y=340)
+    potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz)
+    potvrdplatbu_btn.place(width=200,height=35,x=w//2+155,y=340)
     
     prijemca_entry = tk.Entry(root)
-    prijemca_entry.place(width=200,height=25,x=w//2+155,y=210)
+    prijemca_entry.place(width=200,height=35,x=w//2+155,y=210)
     
     suma_entry = tk.Entry(root)
-    suma_entry.place(width=200,height=25,x=w//2+155,y=280)
+    suma_entry.place(width=200,height=35,x=w//2+155,y=280)
     
     can.create_text(w//2+255,190,text='Prijemca')
     can.create_text(w//2+255,260,text='Suma')
@@ -318,31 +316,47 @@ def platobny_prikaz_def():
     prijmy_tf=False
 
 def sprav_platobny_prikaz():
-    global stva_vybrateho_uctu, suma_entry, prijemca_entry
+    global stva_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID
     subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
     subor_ucty=open('UCTY.txt','r')
     datum = datetime.date.today().strftime('%d%m%Y')
-    poradie=(subor_transakcie.readline().strip())
     print(datum)
     print(stav_vybrateho_uctu)
     print(suma_entry.get())
     print(prijemca_entry.get())
     cislo_uctu= []
+    id_klienta_ucty = []
+    id_transakcie = []
+    id_uctu = []
+    stav_uctu = []
     pocet_uctov=int(subor_ucty.readline().strip())
+    pocet_transakcii=int(subor_transakcie.readline().strip())
+    for v in range(pocet_transakcii):
+        riadocek=subor_transakcie.readline().strip()
+        subor_transakcie_NEW.write(riadocek+'\n')
+    subor_transakcie.close()
+    subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','a')
     for u in range(pocet_uctov):
         riadok = subor_ucty.readline().strip()
         k=riadok.split(';')
+        id_uctu.append(k[0])
+        id_klienta_ucty.append(k[1])
         cislo_uctu.append(k[2])
+        stav_uctu.append(k[4])
         if (stav_vybrateho_uctu)>=(suma_entry.get()) and cislo_uctu[u]==prijemca_entry.get():
-            #poradie+=1
+            print(suma_entry.get())
+            stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
+            print(stav)
+            print((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum)
+            subor_transakcie_NEW.write((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum+'\n')
+            print((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
+            subor_transakcie_NEW.write((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum+'\n')
             print('Moze prebehnut')
+    pocet_transakcii+=2
     subor_transakcie.close()
     subor_transakcie_NEW.close()
     subor_ucty.close()
-    
-    #potvrdplatbu_btn=tk.Button(root,text='potvrdit platbu',command=platobny_prikaz_def)
-    #potvrdplatbu_btn.place(width=200,height=25,x=w//2+155,y=340)
     
 def splatit():
     global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty,stav_vybrateho_uctu
@@ -508,7 +522,7 @@ def prijmy_def():
     for i in range(pocet_transakcii):
         a=int(id_klienta_transakcie[i])
         if  prihlaseny_ID==komu[i] and suma[i][0]=='+':
-            prijmy_list.insert(i, cislo_uctu[a]+(50-len(suma))*' '+suma[i])
+            prijmy_list.insert(i, cislo_uctu[a]+(45-len(suma))*' '+suma[i])
             prijmy_list.insert(i+1, krstne_meno[a]+priezvisko[a])
             prijmy_list.insert(i+2, '')
 #Neviem ci tam chceme pridat aj transakcie kariet
