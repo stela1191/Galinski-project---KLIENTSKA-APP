@@ -316,7 +316,7 @@ def platobny_prikaz_def():
     prijmy_tf=False
 
 def sprav_platobny_prikaz():
-    global stva_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID
+    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID
     subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
     subor_ucty=open('UCTY.txt','r')
@@ -337,6 +337,7 @@ def sprav_platobny_prikaz():
         subor_transakcie_NEW.write(riadocek+'\n')
     subor_transakcie.close()
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','a')
+    p=str(pocet_transakcii)
     for u in range(pocet_uctov):
         riadok = subor_ucty.readline().strip()
         k=riadok.split(';')
@@ -353,7 +354,29 @@ def sprav_platobny_prikaz():
             print((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
             subor_transakcie_NEW.write((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum+'\n')
             print('Moze prebehnut')
-    pocet_transakcii+=2
+            can.create_text(w//2+255,h-230,text='Transakcie bola uspesne uskutocnena', fill='green', font='Arial 12')
+            p=str(pocet_transakcii+2)
+            print(p)
+            uspesna=True
+        else:
+            uspesna=False
+            can.create_text(w//2+255,h-230,text='Nedostatok penazi na ucte', fill='red', font='Arial 12')
+    subor_ucty.close()
+    subor_ucty=open('UCTY.txt','r')
+    for r in range(pocet_uctov+1):
+        riadocek = subor_ucty.readline().strip()  
+        if r == 0:
+             print(riadok+'\n')
+        if r > 0:
+            riadocek_split = riadocek.split(';')
+            if vybraty_ucet == riadocek_split[0] and uspesna==True:
+                r_=riadocek.split(';')
+                stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
+                stav_vybrateho_uctu = stav
+                print('nasiel sa ucet', 'stav noveho: ' + stav)
+                #riadok_ = ';'.join(stav)
+            
+            
     subor_transakcie.close()
     subor_transakcie_NEW.close()
     subor_ucty.close()
