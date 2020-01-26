@@ -149,7 +149,7 @@ def ucty_lock_frame2():
             frame2()  
         bol_lock_ucty = False
     if not login_tf:
-        print('kontrolujem')
+        #print('kontrolujem')
         can.after(2000, ucty_lock_frame2)
     
 def potvrd_ucet_def():
@@ -273,7 +273,6 @@ def okienko():
         arv2 = myCanvas.create_arc(coord, start=uhol_zaporne, extent=uhol_kladne, fill="green")
         myCanvas.create_text(250,100,text=str(sucet_zapornych)+' €',fill='white',font='Arial 15')
         myCanvas.create_text(250,300,text=str(sucet_kladnych)+' €',fill='white',font='Arial 15')
-
     if (sucet_zapornych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=215, fill="green",outline='green')
         myCanvas.create_text(200,200,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
@@ -299,7 +298,7 @@ def platobny_prikaz_def():
 
     can.create_text(w//2+255,150,text='PLATOBNY PRIKAZ',font='Arial 25')
     
-    potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz)
+    potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz,state='active')
     potvrdplatbu_btn.place(width=200,height=35,x=w//2+155,y=340)
     
     prijemca_entry = tk.Entry(root)
@@ -338,6 +337,7 @@ def sprav_platobny_prikaz():
     subor_transakcie.close()
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','a')
     p=str(pocet_transakcii)
+    uspesna=0
     for u in range(pocet_uctov):
         riadok = subor_ucty.readline().strip()
         k=riadok.split(';')
@@ -345,37 +345,39 @@ def sprav_platobny_prikaz():
         id_klienta_ucty.append(k[1])
         cislo_uctu.append(k[2])
         stav_uctu.append(k[4])
-        if (stav_vybrateho_uctu)>=(suma_entry.get()) and cislo_uctu[u]==prijemca_entry.get():
+        if (stav_vybrateho_uctu)>=(suma_entry.get()) and prijemca_entry.get()==cislo_uctu[u]:
+            can.create_rectangle(w//2+230,h-220,w//2+280,h-240,fill='#71CAE7', outline='#71CAE7')
             print(suma_entry.get())
             stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
             print(stav)
-            print((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum)
-            subor_transakcie_NEW.write((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum+'\n')
-            print((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
-            subor_transakcie_NEW.write((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum+'\n')
-            print('Moze prebehnut')
-            can.create_text(w//2+255,h-230,text='Transakcie bola uspesne uskutocnena', fill='green', font='Arial 12')
+
+            if (stav[0])=='-':
+                can.create_rectangle(w//2+230,h-220,w//2+280,h-240,fill='#71CAE7', outline='#71CAE7')
+                uspesna=0
+                textik=can.create_text(w//2+255,h-230,text='Nedostatok penazi na ucte', fill='red', font='Arial 12',tags='no_money')
+                stav=stav_vybrateho_uctu
+                print('NIEEEEEEEEEE')
+            else:
+                textik=can.create_text(w//2+255,h-230,text='Transakcie bola uspesne uskutocnena', fill='green', font='Arial 12',tags='uskutocnena')
+                print((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum)
+                subor_transakcie_NEW.write((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum+'\n')
+                print((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
+                subor_transakcie_NEW.write((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum+'\n')
+                print('Moze prebehnut')
             p=str(pocet_transakcii+2)
             print(p)
-            uspesna=True
+            uspesna=1
+            if uspesna==1:
+                uspesna=0
         else:
-            uspesna=False
-            can.create_text(w//2+255,h-230,text='Nedostatok penazi na ucte', fill='red', font='Arial 12')
+            uspesna=0
+            print('NIEEEEEEEEEEE')
+            #can.create_text(w//2+255,h-230,text='Neexistujuci ucet', fill='red', font='Arial 12',tags='neexistuje')
+             
     subor_ucty.close()
     subor_ucty=open('UCTY.txt','r')
-    for r in range(pocet_uctov+1):
-        riadocek = subor_ucty.readline().strip()  
-        if r == 0:
-             print(riadok+'\n')
-        if r > 0:
-            riadocek_split = riadocek.split(';')
-            if vybraty_ucet == riadocek_split[0] and uspesna==True:
-                r_=riadocek.split(';')
-                stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
-                stav_vybrateho_uctu = stav
-                print('nasiel sa ucet', 'stav noveho: ' + stav)
-                #riadok_ = ';'.join(stav)
-            
+  
+
             
     subor_transakcie.close()
     subor_transakcie_NEW.close()
@@ -548,7 +550,6 @@ def prijmy_def():
             prijmy_list.insert(i, cislo_uctu[a]+(45-len(suma))*' '+suma[i])
             prijmy_list.insert(i+1, krstne_meno[a]+priezvisko[a])
             prijmy_list.insert(i+2, '')
-#Neviem ci tam chceme pridat aj transakcie kariet
     prijmy_list.place(x=w//2+65,y=200)
     
     karty_tf=False
