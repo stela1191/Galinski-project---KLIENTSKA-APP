@@ -315,7 +315,7 @@ def platobny_prikaz_def():
     prijmy_tf=False
 
 def sprav_platobny_prikaz():
-    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID
+    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_transakcii
     subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
     subor_ucty=open('UCTY.txt','r')
@@ -336,7 +336,6 @@ def sprav_platobny_prikaz():
         subor_transakcie_NEW.write('\n'+riadocek)
     subor_transakcie.close()
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','a')
-    p=str(pocet_transakcii)
     uspesna=0
     for u in range(pocet_uctov):
         riadok = subor_ucty.readline().strip()
@@ -365,7 +364,8 @@ def sprav_platobny_prikaz():
                 subor_transakcie_NEW.write(('\n'+str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
                 print('Moze prebehnut')
             p=str(pocet_transakcii+2)
-            print(p)
+            pocet_transakcii=p
+            print(pocet_transakcii)
             uspesna=1
             if uspesna==1:
                 uspesna=0
