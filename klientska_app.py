@@ -49,6 +49,74 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
 
     return can.create_polygon(points, **kwargs, smooth=True,fill=color)
 
+def kontrola_verzii():
+    global klienti_verzia_var, ucty_verzia_var, karty_verzia_var, tran_ucty_verzia_var
+    subor = open('KLIENTI_VERZIA.txt','r')
+    verzia = subor.readline().strip()
+    #if klienti_verzia_var == verzia:
+    #    print('verzia_klienti:'+verzia)
+    if not klienti_verzia_var == verzia:
+        klienti_verzia_var = verzia
+        print('zmena_v_klienta:', klienti_verzia_var)
+        refresh_klienti()
+    subor.close()
+    
+    subor = open('UCTY_VERZIA.txt','r')
+    verzia = subor.readline().strip()
+    #if ucty_verzia_var == verzia:
+    #    print('verzia_ucty:'+verzia)
+    if not ucty_verzia_var == verzia:
+        ucty_verzia_var = verzia
+        print('zmena_v_uctu:', ucty_verzia_var)
+    subor.close()
+    
+    subor = open('KARTY_VERZIA.txt','r')
+    verzia = subor.readline().strip()
+    #if karty_verzia_var == verzia:
+    #    print('verzia_karty:'+verzia)
+    if not karty_verzia_var == verzia:
+        karty_verzia_var = verzia
+        print('zmena_v_karty:', karty_verzia_var)
+    subor.close()
+    
+    subor = open('TRANSAKCIE_UCTY_VERZIA.txt','r')
+    verzia = subor.readline().strip()
+    #if tran_ucty_verzia_var == verzia:
+    #    print('verzia_tran_ucty:'+verzia)
+    if not tran_ucty_verzia_var == verzia:
+        tran_ucty_verzia_var = verzia
+        print('zmena_v_trans_uctov:', tran_ucty_verzia_var)
+    subor.close()
+    
+    can.after(1000,kontrola_verzii)
+
+def refresh_klienti():
+    global refreshujem_klientov
+    if not refreshujem_klientov:
+        kon_klienti()
+    if not lock_klienti:
+        if prihlasene:
+            subor_lock = open('KLIENTI_LOCK.txt','w')
+            subor = open('KLIENTI.txt','r')
+            pocet_klientov = subor.readline().strip()
+            for a in range(int(pocet_klientov)):
+                riadok = subor.readline().strip()
+                riadok_split = riadok.split(';')
+                if riadok_split[0] == prihlaseny_ID:
+                    print('existuje furt')
+                    if riadok_split[1] == krstne_prihlaseny:
+                        if riadok_split[2] == priezvisko_prihlaseny:
+                            if riadok_split[3] == rc_prihlaseny:
+                                print('vsetko sedi')
+                            else:
+                                login()
+            refreshujem_klientov = False
+            subor.close()
+            subor_lock.close()
+            os.remove("KLIENTI_LOCK.txt")
+    elif lock_klienti:
+        can.after(1000,refresh_klienti)
+        refreshujem_klientov = True
 def frame2():
     global frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
 
@@ -125,32 +193,32 @@ def frame2():
     z_loginu=False
 
 ##    prijmy_def()     TOTO NEJDE NECHAPEM PRECO... ked to pustim tak sa zacykluje shell
-    if not bol_lock_ucty:
-        ucty_lock_frame2()
+##    if not bol_lock_ucty:
+##        ucty_lock_frame2()
 
-def ucty_lock_frame2():
-    global bol_lock_ucty, vybraty_ucet
-    kon_ucty()
-    if lock_ucty:
-        vybraty_ucet == ''
-        if frame_3:
-            spat_def()
-        print('nasiel som', lock_ucty, bol_lock_ucty)
-        if frame_2:
-            if not bol_lock_ucty:
-                bol_lock_ucty = True
-                vymaz_lavu_stranu()
-                vymaz_pravu_stranu()
-                frame2()
-        bol_lock_ucty = True
-    elif not lock_ucty:
-        if bol_lock_ucty:
-            bol_lock_ucty = False
-            frame2()  
-        bol_lock_ucty = False
-    if not login_tf:
-        #print('kontrolujem')
-        can.after(2000, ucty_lock_frame2)
+##def ucty_lock_frame2():
+##    global bol_lock_ucty, vybraty_ucet
+##    kon_ucty()
+##    if lock_ucty:
+##        vybraty_ucet == ''
+##        if frame_3:
+##            spat_def()
+##        print('nasiel som', lock_ucty, bol_lock_ucty)
+##        if frame_2:
+##            if not bol_lock_ucty:
+##                bol_lock_ucty = True
+##                vymaz_lavu_stranu()
+##                vymaz_pravu_stranu()
+##                frame2()
+##        bol_lock_ucty = True
+##    elif not lock_ucty:
+##        if bol_lock_ucty:
+##            bol_lock_ucty = False
+##            frame2()  
+##        bol_lock_ucty = False
+##    if not login_tf:
+##        #print('kontrolujem')
+##        can.after(2000, ucty_lock_frame2)
     
 def potvrd_ucet_def():
     global transakcia_btn, platprik_btn, prijmy_btn, karty_btn, vyber_ucet_btn
@@ -656,9 +724,11 @@ def spat_def():
     frame2()
 
 def prihlas():
-    global prihlasit_btn, ID_entry, PW_entry, prihlasene,ID_klientov, rodne_cisla, prihlaseny_ID
+    global prihlasit_btn, ID_entry, PW_entry, prihlasene,ID_klientov, rodne_cisla, prihlaseny_ID, krstne_prihlaseny, priezvisko_prihlaseny, rc_prihlaseny
     kon_klienti()
     citaj_klientov()
+    ID_prihlaseneho=ID_entry.get()
+    print(ID_prihlaseneho)
     if lock_klienti:
         can.delete('lock_oznam')
         can.delete('nespravne_udaje_oznam')
@@ -668,6 +738,10 @@ def prihlas():
         can.delete('nespravne_udaje_oznam')
         for p in range(pocet):
             if ID_entry.get() == ID_klientov[p] and  PW_entry.get() == rodne_cisla[p]:
+                print('umiestnenie pod poctom: '+str(p))
+                krstne_prihlaseny = krstne_meno[p]
+                priezvisko_prihlaseny = priezvisko[p]
+                rc_prihlaseny = rodne_cisla[p]
                 prihlaseny_ID = ID_entry.get()
                 prihlasene=True
                 can.delete('all')
@@ -686,8 +760,9 @@ def kon_klienti():
         lock_klienti = False
     else:
         lock_klienti = True
-    if not prihlasene:
-        can.after(1,kon_klienti)
+    if lock_klienti:
+        print('**KLIENTI.txt LOCKED**')
+        can.after(2000,kon_klienti)
 
 def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
@@ -821,6 +896,12 @@ karty_tf=False
 platobny_prikaz_tf=False
 prijmy_tf=False
 z_loginu=True
+klienti_verzia_var = 0
+ucty_verzia_var = 0
+karty_verzia_var = 0
+tran_ucty_verzia_var = 0
+refreshujem_klientov = False
 login()
+kontrola_verzii()
 
 
