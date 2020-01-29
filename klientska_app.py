@@ -77,6 +77,9 @@ def kontrola_verzii():
     if not karty_verzia_var == verzia:
         karty_verzia_var = verzia
         print('zmena_v_karty:', karty_verzia_var)
+        if karty_tf:
+            vymaz_pravu_stranu()
+            karty_def()
     subor.close()
     
     subor = open('TRANSAKCIE_UCTY_VERZIA.txt','r')
@@ -117,6 +120,7 @@ def refresh_klienti():
     elif lock_klienti:
         can.after(1000,refresh_klienti)
         refreshujem_klientov = True
+        
 def frame2():
     global frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
 
@@ -578,51 +582,60 @@ def splatit():
     splatka=True
     
 def karty_def():
-    global id_kariet_box, dlh_kariet_box, platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatka,splatdlh_btn, karty_list, id_uctu_karty,dlh_karty, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
+    global refreshujem_karty,id_kariet_box, dlh_kariet_box, platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatka,splatdlh_btn, karty_list, id_uctu_karty,dlh_karty, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
     vymaz_pravu_stranu()
 
     id_kariet_box = []
     dlh_kariet_box = []
-    kon_karty()
-    citaj_karty()
+    if not refreshujem_karty:
+        kon_karty()
 
-    karty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    splatka=False
-    poradie = 0
-    for m in range(len(id_uctu_karty)):
-        if vybraty_ucet == id_uctu_karty[m]:
-            poradie+=1
-            if typy_karty[m] == 'D':
-                typ_k = 'DEBETNÁ KARTA '
-                karty_list.insert(poradie, typ_k)
-            else:
-                typ_k = 'KREDITNÁ KARTA, '
-                if splatka==False:
-                    splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
+    if not lock_karty:
+        refreshujem_karty = False
+        print('vykreslujem karty')
+        citaj_karty()
+
+        karty_list = tk.Listbox(root, width=43, height = 8, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
+        splatka=False
+        poradie = 0
+        for m in range(len(id_uctu_karty)):
+            if vybraty_ucet == id_uctu_karty[m]:
+                poradie+=1
+                if typy_karty[m] == 'D':
+                    typ_k = 'DEBETNÁ KARTA '
+                    karty_list.insert(poradie, typ_k)
                 else:
-                    splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str((dlh_karty[m])-splatene))
-            id_kariet_box.append(id_karty[m])
-            dlh_kariet_box.append(dlh_karty[m])
-            
-    karty_list.place(x=w//2+65,y=200)
-    karty_list.bind('<<ListboxSelect>>',vyber_karty_def)
-    
-    can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
+                    typ_k = 'KREDITNÁ KARTA, '
+                    if splatka==False:
+                        splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str(dlh_karty[m]))
+                    else:
+                        splatenie=karty_list.insert(poradie, typ_k + 'dlh na karte: ' + str((dlh_karty[m])-splatene))
+                id_kariet_box.append(id_karty[m])
+                dlh_kariet_box.append(dlh_karty[m])
+                
+        karty_list.place(x=w//2+65,y=200)
+        karty_list.bind('<<ListboxSelect>>',vyber_karty_def)
+        
+        can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
 
-    suma2_entry = tk.Entry(root)
-    suma2_entry.place(width=200,height=25,x=w//2+155,y=h-300)
+        suma2_entry = tk.Entry(root)
+        suma2_entry.place(width=200,height=25,x=w//2+155,y=h-300)
 
-    can.create_text(w//2+255, h-330, text='Zadajte sumu', font='Arial 15')
+        can.create_text(w//2+255, h-330, text='Zadajte sumu', font='Arial 15')
 
-    splatdlh_btn=tk.Button(root,text='SPLATIT DLH',command=splatit)
-    splatdlh_btn.place(width=200,height=25,x=w//2+155,y=h-250)
+        splatdlh_btn=tk.Button(root,text='SPLATIT DLH',command=splatit)
+        splatdlh_btn.place(width=200,height=25,x=w//2+155,y=h-250)
 
-    karty_tf=True
-    platobny_prikaz_tf=False
-    prijmy_tf=False
+        karty_tf=True
+        platobny_prikaz_tf=False
+        prijmy_tf=False
 
-    print(id_kariet_box)
-    print(dlh_kariet_box)
+        print(id_kariet_box)
+        print(dlh_kariet_box)
+    else:
+        refreshujem_karty = True
+        print('refreshujem_karty')
+        can.after(2500, karty_def)
     
 def vyber_karty_def(event):
     global vybrata_karta, dlh_vybratej_karty
@@ -822,14 +835,16 @@ def citaj_klientov():
         os.remove("KLIENTI_LOCK.txt")
     else:
         pocet=0
-
+        print('nic som nenacital')
+        can.after(2000,citaj_klientov)
+        
 def kon_karty():
     global lock_karty
     if not os.path.exists('KARTY_LOCK.txt'):
         lock_karty = False
     else:
         lock_karty = True
-
+        can.after(2000,kon_karty)
 def citaj_karty():
     global cisla_karty, typy_karty, dlh_karty, id_uctu_karty, id_karty, pocet_kariet
     if not lock_karty:
@@ -852,6 +867,7 @@ def citaj_karty():
         subor.close()
         lock_subor.close()
         os.remove("KARTY_LOCK.txt")
+    
         
 def kon_ucty():
     global lock_ucty
@@ -939,6 +955,7 @@ ucty_verzia_var = 0
 karty_verzia_var = 0
 tran_ucty_verzia_var = 0
 refreshujem_klientov = False
+refreshujem_karty = False
 login()
 kontrola_verzii()
 
