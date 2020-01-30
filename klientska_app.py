@@ -12,7 +12,7 @@ w=1280
 #           - Platobny prikaz zapisovanie suboru skoro hotove
 #           - Grafiku
 #           - Transakcie ucty pridat zplatenie kreditnej karty
-#           - Prerovit nka
+#           - Prerovit nka, komu poziciu
 # HOTOVE :  - Platobny prikaz je pripraveny
 #           - Graf
 # OTAZKY :  - Neviem ako rozlisime pri zapisovani prijmu ci je to z kreditnej alebo debetnej karty
