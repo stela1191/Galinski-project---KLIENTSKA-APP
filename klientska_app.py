@@ -819,7 +819,7 @@ def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
         lock_subor = open('KLIENTI_LOCK.txt','w')
-        subor = open('KLIENTI.txt','r',encoding='utf-8')
+        subor = open('KLIENTI.txt','r+')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
         priezvisko=[]
