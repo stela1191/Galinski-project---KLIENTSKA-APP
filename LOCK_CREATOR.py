@@ -81,3 +81,43 @@ lock_zamestnanci_btn.place(width=100,height=75,x=500,y=0)
 lock_zamestnanci_d_btn =tk.Button(root,text='ZAMESTNANCI'+'\n'+'LOCK'+'\n'+'DELETE',command=zamestnanci_lock_delete, state='active')
 lock_zamestnanci_d_btn.place(width=100,height=75,x=500,y=75)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#SKRYTY ODKAZ PANA JANA SLOTU: 'POJDEME DO TANKOCH A ZROVNAME BUDAPEST'
+#CEST JEHO POLITICKEJ PAMIATKE, NECHT HO ANDREJKO HRDO ZASTUPUJE
