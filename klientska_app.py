@@ -12,7 +12,7 @@ w=1280
 #           - Platobny prikaz zapisovanie suboru skoro hotove
 #           - Grafiku
 #           - Transakcie ucty pridat zplatenie kreditnej karty
-#           - Dorobit transakcie ucty citanie s desatinnymi cislami
+#           - Dorobit citanie transakcii desatinne cisla
 # HOTOVE :  - Platobny prikaz je pripraveny
 #           - Graf
 # OTAZKY :  - Neviem ako rozlisime pri zapisovani prijmu ci je to z kreditnej alebo debetnej karty
@@ -300,10 +300,9 @@ def frame3():
             trans_list.insert(cislo, cislo_uctu[a]+(140-len(suma))*' '+suma[i]+' €')
             trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
             trans_list.insert(cislo+2, '')
-            print(float(suma[i]))
-            if int(float(suma[i]))>0:
+            if int(suma[i])>0:
                 celkova_suma+=int(suma[i])
-            if int(float(suma[i]))<0:
+            elif int(suma[i])<0:
                 celkova_suma-=int(suma[i])
             if (suma[i][0])=='-':
                 sucet_zapornych-=int(suma[i])
@@ -405,9 +404,10 @@ def sprav_platobny_prikaz():
     stav_uctu = []
     pocet_transakcii=int(subor_transakcie.readline().strip())
     pocet_uctov=int(subor_ucty.readline().strip())
+    subor_transakcie_NEW.write(pocet_transakcii)
     for v in range(pocet_transakcii):
         riadocek=subor_transakcie.readline().strip()
-        subor_transakcie_NEW.write(riadocek+'\n')
+        subor_transakcie_NEW.write('\n'+riadocek)
         a=riadocek.split(';')
         id_transakcie.append(a[0])
         najvacsie_cislo=id_transakcie
@@ -441,9 +441,9 @@ def sprav_platobny_prikaz():
             else:
                 textik=can.create_text(w//2+255,h-230,text='Transakcie bola uspesne uskutocnena', fill='green', font='Arial 12',tags='uskutocnena')
                 print((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum)
-                subor_transakcie_NEW.write((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum+'\n')
+                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum)
                 print((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
-                subor_transakcie_NEW.write((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum+'\n')
+                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
                 print('Moze prebehnut')
             uspesna=1
             if uspesna==1:
@@ -466,10 +466,10 @@ def sprav_platobny_prikaz():
     subor_transakcie=open('TRANSAKCIE_UCTY.txt','w')
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','r')
     riadok=subor_transakcie_NEW.readline().strip()
-    subor_transakcie.write(str(pocet_transakcii)+'\n')
+    subor_transakcie.write(str(pocet_transakcii))
     while riadok!='':
         riadok=subor_transakcie_NEW.readline().strip()
-        subor_transakcie.write(riadok+'\n')
+        subor_transakcie.write('\n'+riadok)
     subor_transakcie.close()
     subor_transakcie_NEW.close()
     os.remove('TRANSAKCIE_UCTY_NEW.txt')
@@ -485,10 +485,10 @@ def sprav_platobny_prikaz():
     subor_ucty=open('UCTY.txt','w')
     subor_ucty_NEW=open('UCTY_NEW.txt','r')
     riadok=subor_ucty_NEW.readline().strip()
-    subor_ucty.write(str(pocet_uctov)+'\n')
+    subor_ucty.write(str(pocet_uctov))
     while riadok!='':
         riadok=subor_ucty_NEW.readline().strip()
-        subor_ucty.write(riadok+'\n')
+        subor_ucty.write('\n'+riadok)
     subor_ucty.close()
     subor_ucty_NEW.close()
     os.remove('UCTY_NEW.txt')
@@ -513,7 +513,7 @@ def splatit():
         subor = open('KARTY.txt','r+')
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
-            subor_.write(riadok+'\n')   
+            subor_.write('\n'+riadok)   
         subor.close()
         subor_.close()
         
@@ -522,7 +522,7 @@ def splatit():
         for a in range(int(pocet_kariet)+1):
             riadok = subor_.readline().strip()
             if a == 0:
-                subor.write(riadok+'\n')
+                subor.write('\n'+riadok)
             riadok_split=riadok.split(';')
             if a > 0:
                 if riadok_split[0] == vybrata_karta:
@@ -532,21 +532,21 @@ def splatit():
                     r_[7]=dlh
                     print(dlh)
                     riadok = ';'.join(r_)
-                    subor.write(riadok+'\n')
+                    subor.write('\n'+riadok)
                 else:
-                    subor.write(riadok+'\n')
+                    subor.write('\n'+riadok)
         subor.close()
         subor_.close()
         
         subor = open('UCTY.txt','r')
         subor_ = open('UCTY_.txt','w')
         riadok = subor.readline().strip()
-        subor_.write(riadok+'\n')
+        subor_.write('\n'+riadok)
         print('PU:'+str(riadok))
         pocet = int(riadok) 
         for a in range(pocet):
             riadokk = subor.readline().strip()
-            subor_.write(riadokk+'\n')
+            subor_.write('\n'+riadokk)
         subor.close()
         subor_.close()
 
@@ -556,7 +556,7 @@ def splatit():
         for a in range(pocet_uctov+1):
             riadocek = suboris_.readline().strip()     
             if a == 0:
-                suboris.write(riadok+'\n')
+                suboris.write('\n'+riadok)
             
             if a > 0:
                 riadocek_split = riadocek.split(';')
@@ -566,9 +566,9 @@ def splatit():
                     stav_vybrateho_uctu = r_[4]
                     print('nasiel sa ucet', 'stav noveho: ' + r_[4])
                     riadok = ';'.join(r_)
-                    suboris.write(riadok+'\n')
+                    suboris.write('\n'+riadok)
                 else:
-                    suboris.write(riadocek+'\n')
+                    suboris.write('\n'+riadocek)
         suboris.close()
         suboris_.close()
 
@@ -914,7 +914,7 @@ def kon_transakcie_ucty():
 
 
 def citaj_transakcie_ucty():
-    global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu
+    global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu, id_suvisiacej_transakcie
     if not lock_transakcie_ucty:
 ##        can.delete('lock_tran_ucty_oznam')
         lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
@@ -925,6 +925,7 @@ def citaj_transakcie_ucty():
         suma = []
         id_transakcie = []
         komu=[]
+        id_suvisiacej_transakcie=[]
         for r in range(pocet_transakcii): 
             riadok = subor.readline().strip()
             k=riadok.split(';')
@@ -932,7 +933,8 @@ def citaj_transakcie_ucty():
             id_klienta_transakcie.append(k[3])
             suma.append(k[5])
             id_transakcie.append(k[0])
-            komu.append(k[6])
+            id_suvisiacej_transakcie.append(k[6])
+            komu.append(k[8])
         subor.close()
         lock_subor.close()
         os.remove("TRANSAKCIE_UCTY_LOCK.txt")
