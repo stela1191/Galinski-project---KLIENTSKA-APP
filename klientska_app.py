@@ -9,12 +9,12 @@ w=1280
 
 # DOROBIT : - vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
 #           - vysvietit naraz
-#           - Platobny prikaz zapisovanie suboru skoro hotove
+#           - Refreshovat ucty po platobnom prikaze
 #           - Grafiku
-#           - Transakcie ucty pridat zplatenie kreditnej karty
-#           - Dorobit citanie transakcii desatinne cisla
+#           - Dorobit Transakcie ucty pridat zplatenie kreditnej karty 
+
 # HOTOVE :  - Platobny prikaz je pripraveny
-#           - Graf
+#           - Dorobit citanie transakcii desatinne cisla
 # OTAZKY :  - Neviem ako rozlisime pri zapisovani prijmu ci je to z kreditnej alebo debetnej karty
 
 
@@ -145,7 +145,7 @@ def frame2():
     id_uctov_frame2 = []
     
     if not lock_ucty:
-        for l in range((pocet_uctov)-1):#poradie uctov pridat
+        for l in range((pocet_uctov)-1):
             if prihlaseny_ID == id_klienta_ucty[l]:
                 poradie+=1
                 if typ_uctu[l] == 'P':
@@ -262,7 +262,7 @@ def vyber_ucet_def(event):
     stav_vybrateho_uctu=stav_uctu[int(vybraty_ucet)-1]
 
 def frame3():
-    global frame_3, scrollbar, trans_list, spat_btn, otvor_okienko,bol_f3, frame_2, id_uctu,vybraty_ucet,okno,id_uctu_transakcie,prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
+    global frame_3, scrollbar, trans_list, cislo,spat_btn, h_alebo_p ,otvor_okienko,bol_f3, frame_2, id_uctu,vybraty_ucet,okno,id_uctu_transakcie,prihlaseny_ID, id_klienta_transakcie,pocet_transakcii,komu,cislo_uctu,krstne_meno,priezvisko,a,sucet_kladnych,sucet_zapornych,celkova_suma
 
     vymaz_pravu_stranu()
     
@@ -286,6 +286,9 @@ def frame3():
     
     can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
     cislo=0
+    krstne=''
+    priez=''
+    cu=''
     a=[]
     sucet_kladnych=0
     sucet_zapornych=0
@@ -295,26 +298,29 @@ def frame3():
     trans_list = tk.Listbox(root, font='Arial 15')
     trans_list.place(x=100,y=100,width=w-220,height=h-200)
     for i in range(pocet_transakcii):
-        if komu[i]==prihlaseny_ID or id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i]:
-            a=int(id_klienta_transakcie[i])
-            trans_list.insert(cislo, cislo_uctu[a]+(140-len(suma))*' '+suma[i]+' €')
+        if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='P':
+            a=int(komu[i])
+            trans_list.insert(cislo, cislo_uctu[a]+(120-len(suma[i]))*' '+suma[i]+' €')
             trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
             trans_list.insert(cislo+2, '')
-            if int(suma[i])>0:
-                celkova_suma+=int(suma[i])
-            elif int(suma[i])<0:
-                celkova_suma-=int(suma[i])
+       
+## pridat prevod hotovostou
+            if int(float(suma[i]))>0:
+                celkova_suma+=int(float(suma[i]))
+            elif int(float(suma[i]))<0:
+                celkova_suma-=int(float(suma[i]))
             if (suma[i][0])=='-':
-                sucet_zapornych-=int(suma[i])
+                sucet_zapornych-=int(float(suma[i]))
                 trans_list.itemconfig(cislo,{'fg': 'red'})
                 trans_list.itemconfig(cislo+1,{'fg': 'red'})
             if (suma[i][0])=='+':
-                sucet_kladnych+=int(suma[i])
+                sucet_kladnych+=int(float(suma[i]))
                 trans_list.itemconfig(cislo,{'fg': 'green'})
                 trans_list.itemconfig(cislo+1,{'fg': 'green'})
             cislo+=3
             print(celkova_suma)
-            
+                
+
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
         
@@ -347,13 +353,13 @@ def okienko():
         myCanvas.create_text(250,100,text=str(sucet_zapornych)+' €',fill='white',font='Arial 15')
         myCanvas.create_text(250,300,text=str(sucet_kladnych)+' €',fill='white',font='Arial 15')
     if (sucet_zapornych*100)==0:
-        arc = myCanvas.create_arc(coord, start=0, extent=215, fill="green",outline='green')
+        arc = myCanvas.create_arc(coord, start=0, extent=359, fill="green",outline='green')
         myCanvas.create_text(200,200,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
-        arc = myCanvas.create_arc(coord, start=100, extent=260, fill="green",outline='green')
+        arc = myCanvas.create_arc(coord, start=359, extent=1, fill="green",outline='green')
     elif (sucet_kladnych*100)==0:
-        arc = myCanvas.create_arc(coord, start=0, extent=215, fill="red",outline='red')
+        arc = myCanvas.create_arc(coord, start=0, extent=359, fill="red",outline='red')
         myCanvas.create_text(200,200,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
-        arc = myCanvas.create_arc(coord, start=100, extent=260, fill="red",outline='red')
+        arc = myCanvas.create_arc(coord, start=359, extent=1, fill="red",outline='red')
     otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='disabled')
     otvor_okienko.place(width=200,height=35,x=w-300,y=h-95)
 
@@ -388,7 +394,7 @@ def platobny_prikaz_def():
     prijmy_tf=False
 
 def sprav_platobny_prikaz():
-    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov
+    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov, id_suvisiacej_transakcie
     subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
     subor_ucty=open('UCTY.txt','r')
@@ -404,7 +410,7 @@ def sprav_platobny_prikaz():
     stav_uctu = []
     pocet_transakcii=int(subor_transakcie.readline().strip())
     pocet_uctov=int(subor_ucty.readline().strip())
-    subor_transakcie_NEW.write(pocet_transakcii)
+    subor_transakcie_NEW.write(str(pocet_transakcii))
     for v in range(pocet_transakcii):
         riadocek=subor_transakcie.readline().strip()
         subor_transakcie_NEW.write('\n'+riadocek)
@@ -440,10 +446,8 @@ def sprav_platobny_prikaz():
                 print('NIEEEEEEEEEE')
             else:
                 textik=can.create_text(w//2+255,h-230,text='Transakcie bola uspesne uskutocnena', fill='green', font='Arial 12',tags='uskutocnena')
-                print((str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum)
-                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+id_klienta_ucty[u]+';'+datum)
-                print((str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
-                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+prihlaseny_ID+';'+datum)
+                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+(str(pocet_transakcii+2))+';'+datum+';'+id_klienta_ucty[u])
+                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+(str(pocet_transakcii+1))+';'+datum+';'+prihlaseny_ID)
                 print('Moze prebehnut')
             uspesna=1
             if uspesna==1:
@@ -458,8 +462,7 @@ def sprav_platobny_prikaz():
             uspesna=0
             print('NIEEEEEEEEEEE')
             #can.create_text(w//2+255,h-230,text='Neexistujuci ucet', fill='red', font='Arial 12',tags='neexistuje')
-   
-    #return pocet_transakcii         
+      
     subor_ucty.close()
     subor_transakcie_NEW.close()
 
@@ -475,7 +478,7 @@ def sprav_platobny_prikaz():
     os.remove('TRANSAKCIE_UCTY_NEW.txt')
     
     subor_ucty=open('UCTY.txt','r')
-    subor_ucty_NEW=open('UCTY_NEW','w')
+    subor_ucty_NEW=open('UCTY_NEW.txt','w')
     for line in subor_ucty:
         subor_ucty_NEW.write(line.replace(stav_vybrateho_uctu,stav))
 
@@ -492,8 +495,6 @@ def sprav_platobny_prikaz():
     subor_ucty.close()
     subor_ucty_NEW.close()
     os.remove('UCTY_NEW.txt')
-
-    
     
 def splatit():
     global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty,stav_vybrateho_uctu
@@ -574,7 +575,28 @@ def splatit():
 
         os.remove("UCTY_.txt")
         os.remove("KARTY_.txt")
-        
+
+        subor_t_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
+        subor_t=open('TRANSAKCIE_UCTY.txt','r')
+        pocet_t=subor_t.readline().strip()
+        subor_t_NEW.write(int(pocet_t)+1)
+        for p in range(pocet_transakcii+1):
+            r=subor_t.readline().strip()
+            subor_t_NEW.write('\n'+r)
+        subor_t.close()
+        subor_t_NEW.close()
+
+        subor_t_NEW=open('TRANSAKCIE_UCTY_NEW.txt','r')
+        subor_t=open('TRANSAKCIE_UCTY.txt','w')
+        pocet_t=subor_t_NEW.readline().strip()
+        subor_t.write(pocet_t)
+        while riadok!='':
+            riadok=subor_t_NEW.readline().strip()
+            subor_t.write('\n'+riadok)
+        subor_t.write('\n'+(str(pocet_t+1))+';'+'K'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+float(splatene)+';'+''+';'+datum)
+        subor_t.close()
+        subor_t_NEW.close()
+        subor_t_NEW.destroy()
         frame2()
         karty_def()
     else:
@@ -914,7 +936,7 @@ def kon_transakcie_ucty():
 
 
 def citaj_transakcie_ucty():
-    global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu, id_suvisiacej_transakcie
+    global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu, id_suvisiacej_transakcie,h_alebo_p
     if not lock_transakcie_ucty:
 ##        can.delete('lock_tran_ucty_oznam')
         lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
@@ -925,6 +947,7 @@ def citaj_transakcie_ucty():
         suma = []
         id_transakcie = []
         komu=[]
+        h_alebo_p = []
         id_suvisiacej_transakcie=[]
         for r in range(pocet_transakcii): 
             riadok = subor.readline().strip()
@@ -935,6 +958,7 @@ def citaj_transakcie_ucty():
             id_transakcie.append(k[0])
             id_suvisiacej_transakcie.append(k[6])
             komu.append(k[8])
+            h_alebo_p.append(k[2])
         subor.close()
         lock_subor.close()
         os.remove("TRANSAKCIE_UCTY_LOCK.txt")
