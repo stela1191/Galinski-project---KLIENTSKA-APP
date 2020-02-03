@@ -88,6 +88,9 @@ def kontrola_verzii():
     #if tran_ucty_verzia_var == verzia:
     #    print('verzia_tran_ucty:'+verzia)
     if not tran_ucty_verzia_var == verzia:
+        if frame_3:
+            spat_def()
+            frame3()
         tran_ucty_verzia_var = verzia
         print('zmena_v_trans_uctov:', tran_ucty_verzia_var)
     subor.close()
@@ -123,7 +126,7 @@ def refresh_klienti():
         refreshujem_klientov = True
         
 def frame2():
-    global frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
+    global z_frame_3,frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
 
     frame_2=True
     
@@ -158,7 +161,7 @@ def frame2():
        
     ucty_list.bind('<<ListboxSelect>>',vyber_ucet_def)
     ucty_list.place(x=w//2-425,y=200)
-
+        
     if vybraty_ucet == '':
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
         transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
@@ -173,13 +176,14 @@ def frame2():
         karty_btn.place(width=200,height=35,x=w//2-355,y=510)
         
         menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
-        if not bol_lock_ucty:
-            labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
-            labelMenuImgimage = menuImg
-            labelMenuImg.pack()
-            labelMenuImg.place(x=0.45*w,y=h-(0.50*h), anchor="w")
+##        if not bol_lock_ucty:
+##            labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
+##            labelMenuImgimage = menuImg
+##            labelMenuImg.pack()
+##            labelMenuImg.place(x=0.45*w,y=h-(0.50*h), anchor="w")
     else:
-        labelMenuImg.destroy()
+        if not z_loginu or not z_frame_3:
+            labelMenuImg.destroy()
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='active')
         transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
@@ -191,39 +195,26 @@ def frame2():
         
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
         karty_btn.place(width=200,height=35,x=w//2-355,y=510)
-        
+
     if z_loginu:
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
         odhlasenie_btn.place(width=100,height=35,x=w-200,y=10)
-    z_loginu=False
+        labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
+        labelMenuImgimage = menuImg
+        labelMenuImg.pack()
+        labelMenuImg.place(x=0.45*w,y=h-(0.50*h), anchor="w")
+        z_loginu=False
+    if z_frame_3:
+        labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
+        labelMenuImgimage = menuImg
+        labelMenuImg.pack()
+        labelMenuImg.place(x=0.45*w,y=h-(0.50*h), anchor="w")
+        z_frame_3=False
+##    if z_loginu:
+##        odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
+##        odhlasenie_btn.place(width=100,height=35,x=w-200,y=10)
+##        z_loginu=False
 
-##    prijmy_def()     TOTO NEJDE NECHAPEM PRECO... ked to pustim tak sa zacykluje shell
-##    if not bol_lock_ucty:
-##        ucty_lock_frame2()
-
-##def ucty_lock_frame2():
-##    global bol_lock_ucty, vybraty_ucet
-##    kon_ucty()
-##    if lock_ucty:
-##        vybraty_ucet == ''
-##        if frame_3:
-##            spat_def()
-##        print('nasiel som', lock_ucty, bol_lock_ucty)
-##        if frame_2:
-##            if not bol_lock_ucty:
-##                bol_lock_ucty = True
-##                vymaz_lavu_stranu()
-##                vymaz_pravu_stranu()
-##                frame2()
-##        bol_lock_ucty = True
-##    elif not lock_ucty:
-##        if bol_lock_ucty:
-##            bol_lock_ucty = False
-##            frame2()  
-##        bol_lock_ucty = False
-##    if not login_tf:
-##        #print('kontrolujem')
-##        can.after(2000, ucty_lock_frame2)
     
 def potvrd_ucet_def():
     global transakcia_btn, platprik_btn, prijmy_btn, karty_btn, vyber_ucet_btn
@@ -297,28 +288,29 @@ def frame3():
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
     trans_list = tk.Listbox(root, font='Arial 15')
     trans_list.place(x=100,y=100,width=w-220,height=h-200)
-    for i in range(pocet_transakcii):
-        if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='P':
-            a=int(komu[i])
-            trans_list.insert(cislo, cislo_uctu[a]+(120-len(suma[i]))*' '+suma[i]+' €')
-            trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
-            trans_list.insert(cislo+2, '')
-       
+    if not lock_ucty and not lock_klienti and not lock_transakcie_ucty:
+        for i in range(pocet_transakcii):
+            if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='P':
+                a=int(komu[i])
+                trans_list.insert(cislo, cislo_uctu[a]+(120-len(suma[i]))*' '+suma[i]+' €')
+                trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
+                trans_list.insert(cislo+2, '')
+           
 ## pridat prevod hotovostou
-            if int(float(suma[i]))>0:
-                celkova_suma+=int(float(suma[i]))
-            elif int(float(suma[i]))<0:
-                celkova_suma-=int(float(suma[i]))
-            if (suma[i][0])=='-':
-                sucet_zapornych-=int(float(suma[i]))
-                trans_list.itemconfig(cislo,{'fg': 'red'})
-                trans_list.itemconfig(cislo+1,{'fg': 'red'})
-            if (suma[i][0])=='+':
-                sucet_kladnych+=int(float(suma[i]))
-                trans_list.itemconfig(cislo,{'fg': 'green'})
-                trans_list.itemconfig(cislo+1,{'fg': 'green'})
-            cislo+=3
-            print(celkova_suma)
+                if int(float(suma[i]))>0:
+                    celkova_suma+=int(float(suma[i]))
+                elif int(float(suma[i]))<0:
+                    celkova_suma-=int(float(suma[i]))
+                if (suma[i][0])=='-':
+                    sucet_zapornych-=int(float(suma[i]))
+                    trans_list.itemconfig(cislo,{'fg': 'red'})
+                    trans_list.itemconfig(cislo+1,{'fg': 'red'})
+                if (suma[i][0])=='+':
+                    sucet_kladnych+=int(float(suma[i]))
+                    trans_list.itemconfig(cislo,{'fg': 'green'})
+                    trans_list.itemconfig(cislo+1,{'fg': 'green'})
+                cislo+=3
+                print(celkova_suma)
                 
 
     trans_list.config(yscrollcommand=scrollbar.set)
@@ -789,7 +781,8 @@ def vymaz_lavu_stranu():
     ucty_list.destroy()
 
 def spat_def():
-    global scrollbar, trans_list, spat_btn,otvor_okienko
+    global scrollbar, trans_list, spat_btn,otvor_okienko, z_frame_3
+    z_frame_3 = True
     can.delete('all')
     scrollbar.destroy()
     trans_list.destroy()
@@ -831,10 +824,10 @@ def prihlas():
                 
 def kon_klienti():
     global lock_klienti
-    if not os.path.exists('KLIENTI_LOCK.txt'):
-        lock_klienti = False
-    else:
+    if os.path.exists('KLIENTI_LOCK.txt'):
         lock_klienti = True
+    else:
+        lock_klienti = False
     if lock_klienti:
         print('**KLIENTI.txt LOCKED**')
         can.after(2000,kon_klienti)
@@ -896,6 +889,10 @@ def citaj_karty():
 def kon_ucty():
     global lock_ucty
     if not os.path.exists('UCTY_LOCK.txt'):
+        if frame_2 and lock_ucty :
+            lock_ucty = False
+            vymaz_pravu_stranu()
+            frame2()
         lock_ucty = False
         mozes = True
     else:
@@ -930,10 +927,14 @@ def citaj_ucty():
 def kon_transakcie_ucty():
     global lock_transakcie_ucty
     if not os.path.exists('TRANSAKCIE_UCTY_LOCK.txt'):
+        if frame_3 and lock_transakcie_ucty:
+            lock_transakcie_ucty=False
+            frame3()
         lock_transakcie_ucty = False
     else:
         lock_transakcie_ucty = True
-
+    if lock_transakcie_ucty:
+        can.after(2000, kon_transakcie_ucty)
 
 def citaj_transakcie_ucty():
     global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu, id_suvisiacej_transakcie,h_alebo_p,lock_transakcie_ucty
@@ -992,6 +993,7 @@ karty_verzia_var = 0
 tran_ucty_verzia_var = 0
 refreshujem_klientov = False
 refreshujem_karty = False
+z_frame_3 = False
 login()
 kontrola_verzii()
 
