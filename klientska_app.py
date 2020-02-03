@@ -277,9 +277,6 @@ def frame3():
     
     can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
     cislo=0
-    krstne=''
-    priez=''
-    cu=''
     a=[]
     sucet_kladnych=0
     sucet_zapornych=0
