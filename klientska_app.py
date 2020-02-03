@@ -354,11 +354,11 @@ def okienko():
         myCanvas.create_text(250,300,text=str(sucet_kladnych)+' €',fill='white',font='Arial 15')
     if (sucet_zapornych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=359, fill="green",outline='green')
-        myCanvas.create_text(200,200,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
+        myCanvas.create_text(200,150,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
         arc = myCanvas.create_arc(coord, start=359, extent=1, fill="green",outline='green')
     elif (sucet_kladnych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=359, fill="red",outline='red')
-        myCanvas.create_text(200,200,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
+        myCanvas.create_text(200,150,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
         arc = myCanvas.create_arc(coord, start=359, extent=1, fill="red",outline='red')
     otvor_okienko = tk.Button(root,text='ZOBRAZ GRAF',command=okienko,state='disabled')
     otvor_okienko.place(width=200,height=35,x=w-300,y=h-95)
@@ -936,7 +936,7 @@ def kon_transakcie_ucty():
 
 
 def citaj_transakcie_ucty():
-    global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu, id_suvisiacej_transakcie,h_alebo_p
+    global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu, id_suvisiacej_transakcie,h_alebo_p,lock_transakcie_ucty
     if not lock_transakcie_ucty:
 ##        can.delete('lock_tran_ucty_oznam')
         lock_subor = open('TRANSAKCIE_UCTY_LOCK.txt','w')
@@ -959,6 +959,13 @@ def citaj_transakcie_ucty():
             id_suvisiacej_transakcie.append(k[6])
             komu.append(k[8])
             h_alebo_p.append(k[2])
+##            print('id_uctu_transakcie '+id_uctu_transakcie[r])
+##            print('id_klienta_transakcie '+id_klienta_transakcie[r])
+##            print('suma '+suma[r])
+##            print('id_transakcie '+id_transakcie[r])
+##            print('id_suvisiacej_transakcie '+id_suvisiacej_transakcie[r])
+##            print('komu '+komu[r])
+##            print('h_alebo_p '+h_alebo_p[r])
         subor.close()
         lock_subor.close()
         os.remove("TRANSAKCIE_UCTY_LOCK.txt")
@@ -970,6 +977,7 @@ def citaj_transakcie_ucty():
 bol_lock_ucty = False
 prihlaseny_ID = 1
 lock_ucty=False
+lock_transakcie_ucty=False
 ID_klientov=[]
 rodne_cisla=[]
 bol_f3 = False # poistka kvoli blbnutiu odhlasenia f3 je frame 3
