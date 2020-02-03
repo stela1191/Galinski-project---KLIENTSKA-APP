@@ -11,8 +11,8 @@ w=1280
 #           - vysvietit naraz
 #           - Refreshovat ucty po platobnom prikaze
 #           - Grafiku
-#           - Dorobit Transakcie ucty pridat zplatenie kreditnej karty 
-
+#           - Dorobit Transakcie ucty pridat zplatenie kreditnej karty refresh
+#           - Dorobit prijmy
 # HOTOVE :  - Platobny prikaz je pripraveny
 #           - Dorobit citanie transakcii desatinne cisla
 # OTAZKY :  - Neviem ako rozlisime pri zapisovani prijmu ci je to z kreditnej alebo debetnej karty
@@ -126,7 +126,7 @@ def refresh_klienti():
         refreshujem_klientov = True
         
 def frame2():
-    global z_frame_3,frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
+    global z_frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
 
     frame_2=True
     
@@ -161,7 +161,7 @@ def frame2():
        
     ucty_list.bind('<<ListboxSelect>>',vyber_ucet_def)
     ucty_list.place(x=w//2-425,y=200)
-        
+
     if vybraty_ucet == '':
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
         transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
@@ -176,7 +176,7 @@ def frame2():
         karty_btn.place(width=200,height=35,x=w//2-355,y=510)
         
         menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
-##        if not bol_lock_ucty:
+       ##        if not bol_lock_ucty:
 ##            labelMenuImg = tk.Label(image = menuImg,borderwidth=0)
 ##            labelMenuImgimage = menuImg
 ##            labelMenuImg.pack()
@@ -195,7 +195,7 @@ def frame2():
         
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
         karty_btn.place(width=200,height=35,x=w//2-355,y=510)
-
+        
     if z_loginu:
         odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
         odhlasenie_btn.place(width=100,height=35,x=w-200,y=10)
@@ -277,9 +277,6 @@ def frame3():
     
     can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
     cislo=0
-    krstne=''
-    priez=''
-    cu=''
     a=[]
     sucet_kladnych=0
     sucet_zapornych=0
@@ -287,7 +284,6 @@ def frame3():
     scrollbar = tk.Scrollbar(root)
     scrollbar.place(x=w-120,y=100, height=h-200, width=20)
     trans_list = tk.Listbox(root, font='Arial 15')
-    trans_list.place(x=100,y=100,width=w-220,height=h-200)
     if not lock_ucty and not lock_klienti and not lock_transakcie_ucty:
         for i in range(pocet_transakcii):
             if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='P':
@@ -295,8 +291,6 @@ def frame3():
                 trans_list.insert(cislo, cislo_uctu[a]+(120-len(suma[i]))*' '+suma[i]+' €')
                 trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
                 trans_list.insert(cislo+2, '')
-           
-## pridat prevod hotovostou
                 if int(float(suma[i]))>0:
                     celkova_suma+=int(float(suma[i]))
                 elif int(float(suma[i]))<0:
@@ -311,7 +305,25 @@ def frame3():
                     trans_list.itemconfig(cislo+1,{'fg': 'green'})
                 cislo+=3
                 print(celkova_suma)
-                
+    for i in range(pocet_transakcii):
+        if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='H':
+            trans_list.insert(cislo, 'SK'+22*'*'+(130-len(suma[i]))*' '+suma[i]+' €')
+            trans_list.insert(cislo+1, 'Prevod hotovostou')
+            trans_list.insert(cislo+2, '')
+            if int(float(suma[i]))>0:
+                celkova_suma+=int(float(suma[i]))
+            elif int(float(suma[i]))<0:
+                celkova_suma-=int(float(suma[i]))
+            if (suma[i][0])=='-':
+                sucet_zapornych-=int(float(suma[i]))
+                trans_list.itemconfig(cislo,{'fg': 'red'})
+                trans_list.itemconfig(cislo+1,{'fg': 'red'})
+            if (suma[i][0])=='+':
+                sucet_kladnych+=int(float(suma[i]))
+                trans_list.itemconfig(cislo,{'fg': 'green'})
+                trans_list.itemconfig(cislo+1,{'fg': 'green'})
+            cislo+=3
+            print(celkova_suma)
 
     trans_list.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=trans_list.yview)
@@ -328,8 +340,8 @@ def okienko():
     global sucet_kladnych,sucet_zapornych,celkova_suma,plusova,minusova,zaporne,kladne,okno
     okno=True
     newroot=tk.Tk()
-    newroot.geometry('410x410')
-    myCanvas = tk.Canvas(newroot, bg="white", height=400, width=400)
+    newroot.geometry('460x410')
+    myCanvas = tk.Canvas(newroot, bg="white", height=410, width=460)
     coord = 10, 10, 390, 390
     percento_kladne=(sucet_kladnych*100)/celkova_suma
     print(percento_kladne)
@@ -342,8 +354,8 @@ def okienko():
     if (sucet_zapornych*100)!=0 or celkova_suma!=0:
         arc = myCanvas.create_arc(coord, start=0, extent=uhol_zaporne, fill="red")
         arv2 = myCanvas.create_arc(coord, start=uhol_zaporne, extent=uhol_kladne, fill="green")
-        myCanvas.create_text(250,100,text=str(sucet_zapornych)+' €',fill='white',font='Arial 15')
-        myCanvas.create_text(250,300,text=str(sucet_kladnych)+' €',fill='white',font='Arial 15')
+        myCanvas.create_text(410,100,text=str(sucet_zapornych)+' €',fill='red',font='Arial 15')
+        myCanvas.create_text(410,300,text=str(sucet_kladnych)+' €',fill='green',font='Arial 15')
     if (sucet_zapornych*100)==0:
         arc = myCanvas.create_arc(coord, start=0, extent=359, fill="green",outline='green')
         myCanvas.create_text(200,150,text=str(celkova_suma)+' €',fill='white',font='Arial 15')
@@ -662,7 +674,7 @@ def vyber_karty_def(event):
     print(idx, vybrata_karta, dlh_vybratej_karty)
     
 def prijmy_def():
-    global platobny_prikaz_tf, karty_tf,prijmy, prijmy_tf, prijmy_list,prihlasit_btn, suma,ID_entry,pocet_transakcii,krstne_meno,priezvisko,cislo_uctu, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
+    global platobny_prikaz_tf, sumicka, karty_tf,prijmy, prijmy_tf, prijmy_list,prihlasit_btn, suma,ID_entry,pocet_transakcii,krstne_meno,priezvisko,cislo_uctu, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can
 
     vymaz_pravu_stranu()
 
@@ -678,11 +690,11 @@ def prijmy_def():
     
     prijmy=can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25')
     prijmy_list = tk.Listbox(root, width=43, height = pocet, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    
+    sumicka=0
     for i in range(pocet_transakcii):
         a=int(id_klienta_transakcie[i])
-        if  prihlaseny_ID==komu[i] and suma[i][0]=='+':
-            prijmy_list.insert(i, cislo_uctu[a]+(45-len(suma))*' '+suma[i])
+        if  prihlaseny_ID==komu[i] and suma[i][0]=='-':
+            prijmy_list.insert(i, cislo_uctu[a]+(25-len(suma[i]))*' '+(suma[i])+' €')
             prijmy_list.insert(i+1, krstne_meno[a]+' '+priezvisko[a])
             prijmy_list.insert(i+2, '')
     prijmy_list.place(x=w//2+65,y=200)
@@ -781,7 +793,7 @@ def vymaz_lavu_stranu():
     ucty_list.destroy()
 
 def spat_def():
-    global scrollbar, trans_list, spat_btn,otvor_okienko, z_frame_3
+    global scrollbar, trans_list, spat_btn,otvor_okienko,z_frame_3
     z_frame_3 = True
     can.delete('all')
     scrollbar.destroy()
@@ -936,6 +948,7 @@ def kon_transakcie_ucty():
     if lock_transakcie_ucty:
         can.after(2000, kon_transakcie_ucty)
 
+
 def citaj_transakcie_ucty():
     global id_uctu_transakcie, id_klienta_transakcie,suma,id_transakcie,pocet_transakcii,komu, id_suvisiacej_transakcie,h_alebo_p,lock_transakcie_ucty
     if not lock_transakcie_ucty:
@@ -981,6 +994,7 @@ lock_ucty=False
 lock_transakcie_ucty=False
 ID_klientov=[]
 rodne_cisla=[]
+z_frame_3 = False
 bol_f3 = False # poistka kvoli blbnutiu odhlasenia f3 je frame 3
 dlh = 0
 karty_tf=False
@@ -993,7 +1007,6 @@ karty_verzia_var = 0
 tran_ucty_verzia_var = 0
 refreshujem_klientov = False
 refreshujem_karty = False
-z_frame_3 = False
 login()
 kontrola_verzii()
 
