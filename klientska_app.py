@@ -521,7 +521,7 @@ def splatit():
         subor = open('KARTY.txt','r+')
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
-            subor_.write('\n'+riadok)   
+            subor_.write(riadok+'\n')   
         subor.close()
         subor_.close()
         
@@ -530,7 +530,7 @@ def splatit():
         for a in range(int(pocet_kariet)+1):
             riadok = subor_.readline().strip()
             if a == 0:
-                subor.write('\n'+riadok)
+                subor.write(riadok+'\n')
             riadok_split=riadok.split(';')
             if a > 0:
                 if riadok_split[0] == vybrata_karta:
@@ -540,21 +540,21 @@ def splatit():
                     r_[7]=dlh
                     print(dlh)
                     riadok = ';'.join(r_)
-                    subor.write('\n'+riadok)
+                    subor.write(riadok+'\n')
                 else:
-                    subor.write('\n'+riadok)
+                    subor.write(riadok+'\n')
         subor.close()
         subor_.close()
         
         subor = open('UCTY.txt','r')
         subor_ = open('UCTY_.txt','w')
         riadok = subor.readline().strip()
-        subor_.write('\n'+riadok)
+        subor_.write(riadok+'\n')
         print('PU:'+str(riadok))
         pocet = int(riadok) 
         for a in range(pocet):
             riadokk = subor.readline().strip()
-            subor_.write('\n'+riadokk)
+            subor_.write(riadokk+'\n')
         subor.close()
         subor_.close()
 
@@ -564,7 +564,7 @@ def splatit():
         for a in range(pocet_uctov+1):
             riadocek = suboris_.readline().strip()     
             if a == 0:
-                suboris.write('\n'+riadok)
+                suboris.write(riadok+'\n')
             
             if a > 0:
                 riadocek_split = riadocek.split(';')
@@ -574,43 +574,44 @@ def splatit():
                     stav_vybrateho_uctu = r_[4]
                     print('nasiel sa ucet', 'stav noveho: ' + r_[4])
                     riadok = ';'.join(r_)
-                    suboris.write('\n'+riadok)
+                    suboris.write(riadok+'\n')
                 else:
-                    suboris.write('\n'+riadocek)
+                    suboris.write(riadocek+'\n')
         suboris.close()
         suboris_.close()
 
         os.remove("UCTY_.txt")
         os.remove("KARTY_.txt")
 
-        subor_t_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
-        subor_t=open('TRANSAKCIE_UCTY.txt','r')
-        pocet_t=subor_t.readline().strip()
-        subor_t_NEW.write(int(pocet_t)+1)
-        for p in range(pocet_transakcii+1):
-            r=subor_t.readline().strip()
-            subor_t_NEW.write('\n'+r)
-        subor_t.close()
-        subor_t_NEW.close()
-
-        subor_t_NEW=open('TRANSAKCIE_UCTY_NEW.txt','r')
-        subor_t=open('TRANSAKCIE_UCTY.txt','w')
-        pocet_t=subor_t_NEW.readline().strip()
-        subor_t.write(pocet_t)
-        while riadok!='':
-            riadok=subor_t_NEW.readline().strip()
-            subor_t.write('\n'+riadok)
-        subor_t.write('\n'+(str(pocet_t+1))+';'+'K'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+float(splatene)+';'+''+';'+datum)
-        subor_t.close()
-        subor_t_NEW.close()
-        subor_t_NEW.destroy()
-        frame2()
-        karty_def()
-    else:
-        print('nesplatene')
-    
-    subor.close()
+##        subor_t_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
+##        subor_t=open('TRANSAKCIE_UCTY.txt','r')
+##        pocet_t=subor_t.readline().strip()
+##        subor_t_NEW.write(str(int(pocet_t)+1))
+##        for p in range(int(pocet_t)+1):
+##            r=subor_t.readline().strip()
+##            subor_t_NEW.write(r+'\n')
+##        subor_t.close()
+##        subor_t_NEW.close()
+##
+##        subor_t_NEW=open('TRANSAKCIE_UCTY_NEW.txt','r')
+##        subor_t=open('TRANSAKCIE_UCTY.txt','w')
+##        pocet_t=subor_t_NEW.readline().strip()
+##        subor_t.write(pocet_t)
+##        while riadok!='':
+##            riadok=subor_t_NEW.readline().strip()
+##            subor_t.write(riadok+'\n')
+##        subor_t.write((str(pocet_t+1))+';'+'K'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+float(splatene)+';'+''+';'+datum+'\n')
+##        subor_t.close()
+##        subor_t_NEW.close()
+##        subor_t_NEW.destroy()
+##        frame2()
+##        karty_def()
+##    else:
+##        print('nesplatene')
+##    
+##    subor.close()
     splatka=True
+    karty_def()
     
 def karty_def():
     global refreshujem_karty,id_kariet_box, dlh_kariet_box, platobny_prikaz_tf,karty_tf, prijmy_tf, kreditka, splatka,splatdlh_btn, karty_list, id_uctu_karty,dlh_karty, splatene,suma2_entry,dlh,prihlasit_btn, ID_entry, ucty_list,karty_btn,transakcia_btn,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry
@@ -929,7 +930,7 @@ def citaj_ucty():
         typ_uctu = []
         stav_uctu = []
         id_uctu = []
-        for r in range(pocet_uctov): 
+        for r in range(pocet_uctov):
             riadok = subor.readline().strip()
             k=riadok.split(';')
             id_uctu.append(k[0])
@@ -1004,10 +1005,10 @@ karty_tf=False
 platobny_prikaz_tf=False
 prijmy_tf=False
 z_loginu=True
-klienti_verzia_var = 0
-ucty_verzia_var = 0
-karty_verzia_var = 0
-tran_ucty_verzia_var = 0
+klienti_verzia_var = ''
+ucty_verzia_var = ''
+karty_verzia_var = ''
+tran_ucty_verzia_var = ''
 refreshujem_klientov = False
 refreshujem_karty = False
 z_frame_3 = False
