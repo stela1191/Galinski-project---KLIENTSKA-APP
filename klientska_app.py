@@ -521,7 +521,10 @@ def splatit():
         subor = open('KARTY.txt','r+')
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
-            subor_.write(riadok+'\n')   
+            if a==0:
+                subor_.write(riadok) 
+            else:
+                subor_.write('\n'+riadok)   
         subor.close()
         subor_.close()
         
@@ -530,7 +533,7 @@ def splatit():
         for a in range(int(pocet_kariet)+1):
             riadok = subor_.readline().strip()
             if a == 0:
-                subor.write(riadok+'\n')
+                subor.write(riadok)
             riadok_split=riadok.split(';')
             if a > 0:
                 if riadok_split[0] == vybrata_karta:
@@ -540,9 +543,9 @@ def splatit():
                     r_[7]=dlh
                     print(dlh)
                     riadok = ';'.join(r_)
-                    subor.write(riadok+'\n')
+                    subor.write('\n'+riadok)
                 else:
-                    subor.write(riadok+'\n')
+                    subor.write('\n'+riadok)
         subor.close()
         subor_.close()
         
@@ -564,7 +567,7 @@ def splatit():
         for a in range(pocet_uctov+1):
             riadocek = suboris_.readline().strip()     
             if a == 0:
-                suboris.write(riadok+'\n')
+                suboris.write(riadok)
             
             if a > 0:
                 riadocek_split = riadocek.split(';')
@@ -574,9 +577,9 @@ def splatit():
                     stav_vybrateho_uctu = r_[4]
                     print('nasiel sa ucet', 'stav noveho: ' + r_[4])
                     riadok = ';'.join(r_)
-                    suboris.write(riadok+'\n')
+                    suboris.write('\n'+riadok)
                 else:
-                    suboris.write(riadocek+'\n')
+                    suboris.write('\n'+riadocek)
         suboris.close()
         suboris_.close()
 
