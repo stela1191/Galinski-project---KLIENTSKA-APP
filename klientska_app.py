@@ -401,7 +401,7 @@ def platobny_prikaz_def():
     prijmy_tf=False
 
 def sprav_platobny_prikaz():
-    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov, id_suvisiacej_transakcie,stav
+    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov, id_suvisiacej_transakcie,stav,vymaz_pravu_stranu, potvrdplatbu_btn, frame_2,spat_def, bol_platobny
     subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
     subor_ucty=open('UCTY.txt','r')
@@ -456,15 +456,17 @@ def sprav_platobny_prikaz():
                 subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+(str(pocet_transakcii+2))+';'+datum+';'+id_klienta_ucty[u])
                 subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+(str(pocet_transakcii+1))+';'+datum+';'+prihlaseny_ID)
                 print('Moze prebehnut')
-            uspesna=1
+                uspesna=1
             if uspesna==1:
                 uspesna=0
                 p=str(pocet_transakcii+2)
                 pocet_transakcii=p
                 print(pocet_transakcii)
+                potvrdplatbu_btn.destroy()
                 potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz,state='disabled')
                 potvrdplatbu_btn.place(width=200,height=35,x=w//2+155,y=340)
-        
+                dalej_btn=tk.Button(root,text='DALEJ',command=po_platobnom,state='active')
+                dalej_btn.place(width=200,height=35,x=w-310,y=h-145)
         else:
             uspesna=0
             print('NIEEEEEEEEEEE')
@@ -502,6 +504,34 @@ def sprav_platobny_prikaz():
     subor_ucty.close()
     subor_ucty_NEW.close()
     os.remove('UCTY_NEW.txt')
+
+    subor_verzia_ucty=open('UCTY_VERZIA.txt','r')
+    pocet_v_u=int(subor_verzia_ucty.readline())
+    print(pocet_v_u)
+    subor_verzia_ucty.close()
+    subor_verzia_ucty=open('UCTY_VERZIA.txt','w')
+    pocet_v_u+=1
+    print(pocet_v_u)
+    subor_verzia_ucty.write(str(pocet_v_u))
+    subor_verzia_ucty.close()
+
+    subor_verzia_transakcie_ucty=open('TRANSAKCIE_UCTY_VERZIA.txt','r')
+    pocet_v_t_u=int(subor_verzia_transakcie_ucty.readline())
+    print(pocet_v_t_u)
+    subor_verzia_transakcie_ucty.close()
+    subor_verzia_transakcie_ucty=open('TRANSAKCIE_UCTY_VERZIA.txt','w')
+    pocet_v_t_u+=1
+    print(pocet_v_t_u)
+    subor_verzia_transakcie_ucty.write(str(pocet_v_t_u))
+    subor_verzia_transakcie_ucty.close()
+    
+    bol_platobny=True
+    
+def po_platobnom():
+    global vymaz_pravu_stranu, dalej_btn,potvrdplatbu_btn
+    potvrdplatbu_btn.destroy()
+    vymaz_pravu_stranu()
+    frame2()
     
 def splatit():
     global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty,stav_vybrateho_uctu
@@ -586,6 +616,26 @@ def splatit():
         os.remove("UCTY_.txt")
         os.remove("KARTY_.txt")
 
+    subor_verzia_ucty=open('UCTY_VERZIA.txt','r')
+    pocet_v_u=int(subor_verzia_ucty.readline())
+    print(pocet_v_u)
+    subor_verzia_ucty.close()
+    subor_verzia_ucty=open('UCTY_VERZIA.txt','w')
+    pocet_v_u+=1
+    print(pocet_v_u)
+    subor_verzia_ucty.write(str(pocet_v_u))
+    subor_verzia_ucty.close()
+
+    subor_verzia_karty=open('KARTY_VERZIA.txt','r')
+    pocet_v_k=int(subor_verzia_karty.readline())
+    print(pocet_v_k)
+    subor_verzia_karty.close()
+    subor_verzia_karty=open('KARTY_VERZIA.txt','w')
+    pocet_v_k+=1
+    print(pocet_v_k)
+    subor_verzia_karty.write(str(pocet_v_k))
+    subor_verzia_karty.close()
+
 ##        subor_t_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
 ##        subor_t=open('TRANSAKCIE_UCTY.txt','r')
 ##        pocet_t=subor_t.readline().strip()
@@ -654,12 +704,12 @@ def karty_def():
         can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
 
         suma2_entry = tk.Entry(root)
-        suma2_entry.place(width=200,height=25,x=w//2+155,y=h-300)
+        suma2_entry.place(width=200,height=35,x=w//2+155,y=h-300)
 
         can.create_text(w//2+255, h-330, text='Zadajte sumu', font='Arial 15')
 
         splatdlh_btn=tk.Button(root,text='SPLATIT DLH',command=splatit)
-        splatdlh_btn.place(width=200,height=25,x=w//2+155,y=h-250)
+        splatdlh_btn.place(width=200,height=35,x=w//2+155,y=h-250)
 
         karty_tf=True
         platobny_prikaz_tf=False
@@ -700,8 +750,8 @@ def prijmy_def():
     cislo=0
     for i in range(pocet_transakcii):
         a=int(id_klienta_transakcie[i])
-        if  prihlaseny_ID==komu[i] and suma[i][0]=='+':
-            prijmy_list.insert(cislo, cislo_uctu[a]+(25-len(suma[i]))*' '+'+'+(suma[i])+' €')
+        if  id_klienta_transakcie[i]==prihlaseny_ID and suma[i][0]=='+':
+            prijmy_list.insert(cislo, cislo_uctu[a]+(25-len(suma[i]))*' '+(suma[i])+' €')
             prijmy_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
             prijmy_list.insert(cislo+2, '')
         cislo+=3
@@ -757,12 +807,13 @@ def login():
 
 
 def odhlas():
-    global  ucty_list, karty_btn, transakcia_btn, platprik_btn, prijmy_btn, scrollbar, trans_list, spat_btn,odhlasenie_btn,otvor_okienko
+    global  ucty_list, karty_btn, transakcia_btn, platprik_btn, prijmy_btn, scrollbar, trans_list, spat_btn,odhlasenie_btn,otvor_okienko,dalej_btn,bol_platobny
     can.delete('all')
     odhlasenie_btn.destroy()
     vymaz_pravu_stranu()
     vymaz_lavu_stranu()
-    
+    if bol_platobny:
+        dalej_btn.destroy()
     if bol_f3:
         scrollbar.destroy()
         trans_list.destroy()
@@ -802,7 +853,7 @@ def vymaz_lavu_stranu():
     ucty_list.destroy()
 
 def spat_def():
-    global scrollbar, trans_list, spat_btn,otvor_okienko, z_frame_3
+    global scrollbar, trans_list, spat_btn,otvor_okienko, z_frame_3,dalej_btn,bol_platobny
     z_frame_3 = True
     can.delete('all')
     scrollbar.destroy()
@@ -810,6 +861,8 @@ def spat_def():
     spat_btn.destroy()
     otvor_okienko.destroy()
     labelMenuImg.destroy()
+    if bol_platobny:
+        dalej_btn.destroy()
     frame2()
 
 def prihlas():
@@ -1003,6 +1056,7 @@ lock_transakcie_ucty=False
 ID_klientov=[]
 rodne_cisla=[]
 bol_f3 = False # poistka kvoli blbnutiu odhlasenia f3 je frame 3
+bol_platobny=False
 dlh = 0
 karty_tf=False
 platobny_prikaz_tf=False
@@ -1015,6 +1069,7 @@ tran_ucty_verzia_var = ''
 refreshujem_klientov = False
 refreshujem_karty = False
 z_frame_3 = False
+bol_platobny=False
 login()
 kontrola_verzii()
 
