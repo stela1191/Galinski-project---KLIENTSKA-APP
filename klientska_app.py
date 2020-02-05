@@ -155,7 +155,7 @@ def frame2():
                     typ_u = 'SÚKROMNÝ ÚČET '
                 else:
                     typ_u = 'OBCHODNÝ ÚČET '
-                ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(stav_uctu[l])+' €')
+                ucty_list.insert(poradie*2, typ_u+ ' '*(50- len(stav_uctu[l])) + str(round(float(stav_uctu[l]), 2))+' €')
                 ucty_list.insert(poradie*2, str(cislo_uctu[l]) )
                 id_uctov_frame2.append(id_uctu[l])
        
@@ -292,16 +292,16 @@ def frame3():
                 trans_list.insert(cislo, cislo_uctu[a]+(120-len(suma[i]))*' '+suma[i]+' €')
                 trans_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
                 trans_list.insert(cislo+2, '')
-                if int(float(suma[i]))>0:
-                    celkova_suma+=int(float(suma[i]))
-                elif int(float(suma[i]))<0:
-                    celkova_suma-=int(float(suma[i]))
+                if (float(suma[i]))>0:
+                    celkova_suma+=(float(suma[i]))
+                elif (float(suma[i]))<0:
+                    celkova_suma-=(float(suma[i]))
                 if (suma[i][0])=='-':
-                    sucet_zapornych-=int(float(suma[i]))
+                    sucet_zapornych-=(float(suma[i]))
                     trans_list.itemconfig(cislo,{'fg': 'red'})
                     trans_list.itemconfig(cislo+1,{'fg': 'red'})
                 if (suma[i][0])=='+':
-                    sucet_kladnych+=int(float(suma[i]))
+                    sucet_kladnych+=(float(suma[i]))
                     trans_list.itemconfig(cislo,{'fg': 'green'})
                     trans_list.itemconfig(cislo+1,{'fg': 'green'})
                 cislo+=3
