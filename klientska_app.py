@@ -57,7 +57,7 @@ def kontrola_verzii():
     if not ucty_verzia_var == verzia:
         ucty_verzia_var = verzia
         print('zmena_v_uctu:', ucty_verzia_var)
-        if frame_2 and not bol_platobny:
+        if frame_2 and bol_platobny:
             frame2()
             prijmy_def()
             z_loginu=False
@@ -597,7 +597,7 @@ def splatit():
     print('stav uctu=' + stav_vybrateho_uctu)
     print('zadane=' + splatene)
     pocet_kariet = subor.readline().strip()
-    if float(stav_vybrateho_uctu) >= float(splatene) and float(splatene) <= float(dlh_vybratej_karty):
+    if float(stav_vybrateho_uctu) >= float(splatene) and float(splatene) <= float(dlh_vybratej_karty) and int(splatene) > 0:
         for a in range(int(pocet_kariet)):
             riadok_ = subor.readline().strip()
             riadok=riadok_.split(';')
@@ -805,7 +805,6 @@ def prijmy_def():
     
     prijmy=can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25', fill='#146381')
     prijmy_list = tk.Listbox(root, width=43, height = pocet, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
-    can.create_text(w//2,75,text='Transakcie', font= 'Arial 25', fill='#146381')
     cislo=0
     a=[]
     if not lock_ucty and not lock_klienti and not lock_transakcie_ucty:
