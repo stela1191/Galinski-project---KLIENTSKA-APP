@@ -43,11 +43,9 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
     return can.create_polygon(points, **kwargs, smooth=True,fill=color, outline='#146381')
 
 def kontrola_verzii():
-    global klienti_verzia_var, ucty_verzia_var, karty_verzia_var, tran_ucty_verzia_var,z_loginu
+    global klienti_verzia_var, ucty_verzia_var, karty_verzia_var, tran_ucty_verzia_var,z_loginu,refreshujem_prijmy
     subor = open('KLIENTI_VERZIA.txt','r')
     verzia = subor.readline().strip()
-    #if klienti_verzia_var == verzia:
-    #    print('verzia_klienti:'+verzia)
     if not klienti_verzia_var == verzia:
         klienti_verzia_var = verzia
         print('zmena_v_klienta:', klienti_verzia_var)
@@ -56,21 +54,18 @@ def kontrola_verzii():
     
     subor = open('UCTY_VERZIA.txt','r')
     verzia = subor.readline().strip()
-    #if ucty_verzia_var == verzia:
-    #    print('verzia_ucty:'+verzia)
     if not ucty_verzia_var == verzia:
         ucty_verzia_var = verzia
         print('zmena_v_uctu:', ucty_verzia_var)
-    #if frame_2:
-     #       z_loginu=True
-      #      frame2()
-       #     z_loginu=False
+        if frame_2 and not bol_platobny:
+            frame2()
+            prijmy_def()
+            z_loginu=False
+            refreshujem_prijmy=True
     subor.close()
     
     subor = open('KARTY_VERZIA.txt','r')
     verzia = subor.readline().strip()
-    #if karty_verzia_var == verzia:
-    #    print('verzia_karty:'+verzia)
     if not karty_verzia_var == verzia:
         karty_verzia_var = verzia
         print('zmena_v_karty:', karty_verzia_var)
@@ -81,8 +76,6 @@ def kontrola_verzii():
     
     subor = open('TRANSAKCIE_UCTY_VERZIA.txt','r')
     verzia = subor.readline().strip()
-    #if tran_ucty_verzia_var == verzia:
-    #    print('verzia_tran_ucty:'+verzia)
     if not tran_ucty_verzia_var == verzia:
         if frame_3:
             spat_def()
@@ -122,10 +115,11 @@ def refresh_klienti():
         refreshujem_klientov = True
         
 def frame2():
-    global z_frame_3,frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
+    global refreshujem_prijmy,bol_platobny,z_frame_3,frame_3, login_tf, prihlasit_btn, ID_entry, pocet_uctov,ucty_list,karty_btn,transakcia_btn,menuImg,labelMenuImg,platprik_btn,potvrdplatbu_btn,prijmy_btn,splatdlh_btn,prijemca_entry,suma_entry,can, odhlasenie_btn, z_loginu, frame_2,id_uctov_frame2
 
     frame_2=True
-    
+
+    bol_platobny=False
     frame_3=False
     login_tf=False
     kon_ucty()
@@ -210,7 +204,7 @@ def frame2():
 ##        odhlasenie_btn=tk.Button(root,text='ODHLÁSIŤ SA',command=odhlas)
 ##        odhlasenie_btn.place(width=100,height=35,x=w-200,y=10)
 ##        z_loginu=False
-
+    refreshujem_prijmy=False
     
 def potvrd_ucet_def():
     global transakcia_btn, platprik_btn, prijmy_btn, karty_btn, vyber_ucet_btn
@@ -398,8 +392,10 @@ def platobny_prikaz_def():
 def sprav_platobny_prikaz():
     global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov, id_suvisiacej_transakcie,stav,vymaz_pravu_stranu, potvrdplatbu_btn,udaj, frame_2,spat_def, bol_platobny,dalej_btn
     prebehla = False
-    kon_ucty
-    if not lock_ucty:
+    kon_ucty()
+    kon_transakcie_ucty()
+    can.delete('neexistuje')
+    if not lock_ucty or not lock_transakcie_ucty:
         subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
         subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
         subor_ucty=open('UCTY.txt','r')
@@ -474,10 +470,12 @@ def sprav_platobny_prikaz():
             else:
                 uspesna=0
                 print('NIEEEEEEEEEEE')
-                #can.create_text(w//2+255,h-230,text='Neexistujuci ucet', fill='red', font='Arial 12',tags='neexistuje')
-          
+                can.create_text(w//2+255,h-230,text='Neexistujuci ucet', fill='red', font='Arial 12',tags='neexistuje')
         subor_ucty.close()
         subor_transakcie_NEW.close()
+    if lock_ucty or lock_transakcie_ucty:
+        prebieha_audit_pp()
+
 
     if prebehla:
         subor_transakcie=open('TRANSAKCIE_UCTY.txt','w')
@@ -552,7 +550,37 @@ def sprav_platobny_prikaz():
         subor_verzia_transakcie_ucty.close()
     
     bol_platobny=True
-    
+
+def prebieha_audit_pp():
+    global cislujem
+    cislujem+=1
+    if cislujem == 1:
+        can.create_text(w//2+255,h-310,text='Prebieha audit', fill='red', font='Arial 12',tags='audit_plat_prik_text')
+        can.create_text(w//2+255-10,h-300,text='.', fill='red', font='Arial 30',tags='gulicka')
+    if cislujem == 2:
+        can.delete('gulicka')
+        can.create_text(w//2+255-5,h-300,text='.', fill='red', font='Arial 30',tags='gulicka')
+    if cislujem == 3:
+        can.delete('gulicka')
+        can.create_text(w//2+255,h-300,text='.', fill='red', font='Arial 30',tags='gulicka')
+    if cislujem == 4:
+        can.delete('gulicka')
+        can.create_text(w//2+255+5,h-300,text='.', fill='red', font='Arial 30',tags='gulicka')
+    if cislujem == 5:
+        can.delete('gulicka')
+        can.create_text(w//2+255+10,h-300,text='.', fill='red', font='Arial 30',tags='gulicka')
+    if cislujem<=5:
+        can.after(200, prebieha_audit_pp)
+    else:
+        cislujem=0
+        can.delete('gulicka')
+        can.delete('audit_plat_prik_text')
+        kon_ucty()
+        kon_transakcie_ucty()
+        if lock_ucty or lock_transakcie_ucty:
+            prebieha_audit_pp()
+
+        
 def po_platobnom():
     global vymaz_pravu_stranu, dalej_btn,potvrdplatbu_btn
     can.delete('all')
@@ -577,8 +605,8 @@ def splatit():
                 print('splatene')
         subor.close()
         subor_ = open('KARTY_.txt','w')
-        subor = open('KARTY.txt','r+')
-        #subor = open('KARTY.txt',encoding='utf-8')
+        #subor = open('KARTY.txt','r+')
+        subor = open('KARTY.txt',encoding='utf-8')
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
             if a==0:
@@ -950,8 +978,8 @@ def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
         lock_subor = open('KLIENTI_LOCK.txt','w')
-        subor = open('KLIENTI.txt','r+')
-        #subor = open('KLIENTI.txt',encoding='utf-8')
+        #subor = open('KLIENTI.txt','r+')
+        subor = open('KLIENTI.txt',encoding='utf-8')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
         priezvisko=[]
@@ -1004,7 +1032,7 @@ def citaj_karty():
 def kon_ucty():
     global lock_ucty
     if not os.path.exists('UCTY_LOCK.txt'):
-        if frame_2 and lock_ucty :
+        if frame_2 and lock_ucty and not platobny_prikaz_tf:
             lock_ucty = False
             vymaz_pravu_stranu()
             frame2()
@@ -1110,7 +1138,7 @@ tran_ucty_verzia_var = ''
 refreshujem_klientov = False
 refreshujem_karty = False
 z_frame_3 = False
-bol_platobny=False
+cislujem=0
 login()
 kontrola_verzii()
 
