@@ -57,7 +57,7 @@ def kontrola_verzii():
     if not ucty_verzia_var == verzia:
         ucty_verzia_var = verzia
         print('zmena_v_uctu:', ucty_verzia_var)
-        if frame_2 and bol_platobny:
+        if frame_2 and not karty_tf:
             frame2()
             prijmy_def()
             z_loginu=False
@@ -605,8 +605,8 @@ def splatit():
                 print('splatene')
         subor.close()
         subor_ = open('KARTY_.txt','w')
-        #subor = open('KARTY.txt','r+')
-        subor = open('KARTY.txt',encoding='utf-8')
+        subor = open('KARTY.txt','r+')
+        #subor = open('KARTY.txt',encoding='utf-8')
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
             if a==0:
@@ -977,8 +977,8 @@ def citaj_klientov():
     global ID_klientov, rodne_cisla, pocet,krstne_meno,priezvisko
     if not lock_klienti:
         lock_subor = open('KLIENTI_LOCK.txt','w')
-        #subor = open('KLIENTI.txt','r+')
-        subor = open('KLIENTI.txt',encoding='utf-8')
+        subor = open('KLIENTI.txt','r+')
+        #subor = open('KLIENTI.txt',encoding='utf-8')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
         priezvisko=[]
