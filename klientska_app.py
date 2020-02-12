@@ -40,7 +40,7 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
               x1, y1+radius,
               x1, y1]
 
-    return can.create_polygon(points, **kwargs, smooth=True,fill=color)
+    return can.create_polygon(points, **kwargs, smooth=True,fill=color, outline='#146381')
 
 def kontrola_verzii():
     global klienti_verzia_var, ucty_verzia_var, karty_verzia_var, tran_ucty_verzia_var,z_loginu
@@ -133,9 +133,9 @@ def frame2():
     if not lock_ucty:
         citaj_ucty()
         
-    round_rectangle(100, 100, w-100, h-100, radius=50,color='#71CAE7', outline='black',width=3)
+    round_rectangle(100, 100, w-100, h-100, radius=50,color='#71CAE7', width=3)
     
-    can.create_text(w//2-255,150,text='ÚČTY',font='Arial 25')
+    can.create_text(w//2-255,150,text='ÚČTY',font='Arial 25', fill='#146381')
     can.create_text(w//2-255,300,text='zostatok na ucte: 1234$6',font='Arial 20')
    
     ucty_list = tk.Listbox(root, width=43, height = 8, font='Arial 11', xscrollcommand=True)
@@ -268,9 +268,9 @@ def frame3():
     citaj_ucty()
     citaj_klientov()
     
-    round_rectangle(50, 50, w-50, h-50, radius=50,color='#71CAE7', outline='black',width=3)
+    round_rectangle(50, 50, w-50, h-50, radius=50,color='#71CAE7', width=3)
     
-    can.create_text(w//2,75,text='Transakcie', font= 'Arial 25')
+    can.create_text(w//2,75,text='Transakcie', font= 'Arial 25', fill='#146381')
     cislo=0
     a=[]
     sucet_kladnych=0
@@ -377,7 +377,7 @@ def platobny_prikaz_def():
     kon_ucty()
     citaj_ucty()
 
-    can.create_text(w//2+255,150,text='PLATOBNÝ PRÍKAZ',font='Arial 25')
+    can.create_text(w//2+255,150,text='PLATOBNÝ PRÍKAZ',font='Arial 25', fill='#146381')
     
     potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz,state='active')
     potvrdplatbu_btn.place(width=200,height=35,x=w//2+155,y=340)
@@ -397,133 +397,159 @@ def platobny_prikaz_def():
 
 def sprav_platobny_prikaz():
     global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov, id_suvisiacej_transakcie,stav,vymaz_pravu_stranu, potvrdplatbu_btn,udaj, frame_2,spat_def, bol_platobny,dalej_btn
-    subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
-    subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
-    subor_ucty=open('UCTY.txt','r')
-    datum = datetime.date.today().strftime('%d%m%Y')
-    print(datum)
-    print(stav_vybrateho_uctu)
-    print(suma_entry.get())
-    print(prijemca_entry.get())
-    cislo_uctu= []
-    id_klienta_ucty = []
-    id_transakcie = []
-    id_uctu = []
-    stav_uctu = []
-    pocet_transakcii=int(subor_transakcie.readline().strip())
-    pocet_uctov=int(subor_ucty.readline().strip())
-    subor_transakcie_NEW.write(str(pocet_transakcii))
-    for v in range(pocet_transakcii):
-        riadocek=subor_transakcie.readline().strip()
-        subor_transakcie_NEW.write('\n'+riadocek)
-        a=riadocek.split(';')
-        id_transakcie.append(a[0])
-        najvacsie_cislo=id_transakcie
-    print(najvacsie_cislo)
-    subor_transakcie_NEW.close()
-    subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','a')
-    uspesna=0
-    num_lines = sum(1 for line in open('TRANSAKCIE_UCTY.txt'))
-    pocetriadkov = num_lines - (1)
-    pocetriadkov_str = str(pocetriadkov)
-    print(pocetriadkov_str)
+    prebehla = False
+    kon_ucty
+    if not lock_ucty:
+        subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
+        subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
+        subor_ucty=open('UCTY.txt','r')
+        datum = datetime.date.today().strftime('%d%m%Y')
+        print(datum)
+        print(stav_vybrateho_uctu)
+        print(suma_entry.get())
+        print(prijemca_entry.get())
+        cislo_uctu= []
+        id_klienta_ucty = []
+        id_transakcie = []
+        id_uctu = []
+        stav_uctu = []
+        pocet_transakcii=int(subor_transakcie.readline().strip())
+        pocet_uctov=int(subor_ucty.readline().strip())
+        subor_transakcie_NEW.write(str(pocet_transakcii))
+        for v in range(pocet_transakcii):
+            riadocek=subor_transakcie.readline().strip()
+            subor_transakcie_NEW.write('\n'+riadocek)
+            a=riadocek.split(';')
+            id_transakcie.append(a[0])
+            najvacsie_cislo=id_transakcie
+        print(najvacsie_cislo)
+        subor_transakcie_NEW.close()
+        subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','a')
+        uspesna=0
+        num_lines = sum(1 for line in open('TRANSAKCIE_UCTY.txt'))
+        pocetriadkov = num_lines - (1)
+        pocetriadkov_str = str(pocetriadkov)
+        print(pocetriadkov_str)
 
-    for u in range(pocet_uctov):
-        riadok = subor_ucty.readline().strip()
-        k=riadok.split(';')
-        id_uctu.append(k[0])
-        id_klienta_ucty.append(k[1])
-        cislo_uctu.append(k[2])
-        stav_uctu.append(k[4])
-        if (stav_vybrateho_uctu)>=(suma_entry.get()) and prijemca_entry.get()==cislo_uctu[u]:
-            can.create_rectangle(w//2+230,h-220,w//2+280,h-240,fill='#71CAE7', outline='#71CAE7')
-            print(suma_entry.get())
-            stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
-            print(stav)
-            if (stav[0])=='-':
+        for u in range(pocet_uctov):
+            riadok = subor_ucty.readline().strip()
+            k=riadok.split(';')
+            id_uctu.append(k[0])
+            id_klienta_ucty.append(k[1])
+            cislo_uctu.append(k[2])
+            stav_uctu.append(k[4])
+            print(str(stav_vybrateho_uctu)+">="+str(suma_entry.get()))
+            print(prijemca_entry.get()+"="+cislo_uctu[u])
+            if (stav_vybrateho_uctu)>=(suma_entry.get()) and prijemca_entry.get()==cislo_uctu[u] and int(suma_entry.get()) > 0:
                 can.create_rectangle(w//2+230,h-220,w//2+280,h-240,fill='#71CAE7', outline='#71CAE7')
-                uspesna=0
-                textik=can.create_text(w//2+255,h-230,text='Nedostatok penazi na ucte', fill='red', font='Arial 12',tags='no_money')
-                stav=stav_vybrateho_uctu
-                print('NIEEEEEEEEEE')
+                print(suma_entry.get())
+                stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
+                print(stav)
+                if (stav[0])=='-':
+                    can.create_rectangle(w//2+230,h-220,w//2+280,h-240,fill='#71CAE7', outline='#71CAE7')
+                    uspesna=0
+                    textik=can.create_text(w//2+255,h-230,text='Nedostatok penazi na ucte', fill='red', font='Arial 12',tags='no_money')
+                    stav=stav_vybrateho_uctu
+                    print('nejdem')
+                else:
+                    textik=can.create_text(w//2+255,h-230,text='Transakcie bola uspesne uskutocnena', fill='green', font='Arial 12',tags='uskutocnena')
+                    subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+(str(pocet_transakcii+2))+';'+datum+';'+id_klienta_ucty[u])
+                    subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+(str(pocet_transakcii+1))+';'+datum+';'+prihlaseny_ID)
+                    print('Moze prebehnut')
+                    uspesna=1
+                    print('KOMU UDAJE '+id_klienta_ucty[u]+' '+cislo_uctu[u]+' '+stav_uctu[u])
+                    novy_stav_komu=(str(float(stav_uctu[u])+float(suma_entry.get())))
+                    print(novy_stav_komu)
+                if uspesna==1:
+                    prebehla = True
+                    uspesna=0
+                    p=str(pocet_transakcii+2)
+                    pocet_transakcii=p
+                    print(pocet_transakcii)
+                    potvrdplatbu_btn.destroy()
+                    potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz,state='disabled')
+                    potvrdplatbu_btn.place(width=200,height=35,x=w//2+155,y=340)
+                    dalej_btn=tk.Button(root,text='DALEJ',command=po_platobnom,state='active')
+                    dalej_btn.place(width=200,height=35,x=w-310,y=h-145)
             else:
-                textik=can.create_text(w//2+255,h-230,text='Transakcie bola uspesne uskutocnena', fill='green', font='Arial 12',tags='uskutocnena')
-                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+1))+';'+'D'+';'+'P'+';'+vybraty_ucet+';'+prihlaseny_ID+';'+'-'+suma_entry.get()+';'+(str(pocet_transakcii+2))+';'+datum+';'+id_klienta_ucty[u])
-                subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+(str(pocet_transakcii+1))+';'+datum+';'+prihlaseny_ID)
-                print('Moze prebehnut')
-                uspesna=1
-                print('KOMU UDAJE '+id_klienta_ucty[u]+' '+cislo_uctu[u]+' '+stav_uctu[u])
-                novy_stav_komu=(str(float(stav_uctu[u])+float(suma_entry.get())))
-                print(novy_stav_komu)
-            if uspesna==1:
                 uspesna=0
-                p=str(pocet_transakcii+2)
-                pocet_transakcii=p
-                print(pocet_transakcii)
-                potvrdplatbu_btn.destroy()
-                potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz,state='disabled')
-                potvrdplatbu_btn.place(width=200,height=35,x=w//2+155,y=340)
-                dalej_btn=tk.Button(root,text='DALEJ',command=po_platobnom,state='active')
-                dalej_btn.place(width=200,height=35,x=w-310,y=h-145)
-        else:
-            uspesna=0
-            print('NIEEEEEEEEEEE')
-            #can.create_text(w//2+255,h-230,text='Neexistujuci ucet', fill='red', font='Arial 12',tags='neexistuje')
-      
-    subor_ucty.close()
-    subor_transakcie_NEW.close()
+                print('NIEEEEEEEEEEE')
+                #can.create_text(w//2+255,h-230,text='Neexistujuci ucet', fill='red', font='Arial 12',tags='neexistuje')
+          
+        subor_ucty.close()
+        subor_transakcie_NEW.close()
 
-    subor_transakcie=open('TRANSAKCIE_UCTY.txt','w')
-    subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','r')
-    riadok=subor_transakcie_NEW.readline().strip()
-    subor_transakcie.write(str(pocet_transakcii))
-    while riadok!='':
+    if prebehla:
+        subor_transakcie=open('TRANSAKCIE_UCTY.txt','w')
+        subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','r')
         riadok=subor_transakcie_NEW.readline().strip()
-        subor_transakcie.write('\n'+riadok)
-    subor_transakcie.close()
-    subor_transakcie_NEW.close()
-    os.remove('TRANSAKCIE_UCTY_NEW.txt')
-    
-    subor_ucty=open('UCTY.txt','r')
-    subor_ucty_NEW=open('UCTY_NEW.txt','w')
-    stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
-    for line in subor_ucty:
-        subor_ucty_NEW.write(line.replace(stav_vybrateho_uctu,stav))
+        subor_transakcie.write(str(pocet_transakcii))
+        while riadok!='':
+            riadok=subor_transakcie_NEW.readline().strip()
+            subor_transakcie.write('\n'+riadok)
+        subor_transakcie.close()
+        subor_transakcie_NEW.close()
+        os.remove('TRANSAKCIE_UCTY_NEW.txt')
+        
+        subor_ucty=open('UCTY.txt','r')
+        subor_ucty_NEW=open('UCTY_NEW.txt','w')
+        stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
+        for line in subor_ucty:
+            subor_ucty_NEW.write(line.replace(stav_vybrateho_uctu,stav))
 
-    subor_ucty.close()
-    subor_ucty_NEW.close()
+        subor_ucty.close()
+        subor_ucty_NEW.close()
 
-    subor_ucty=open('UCTY.txt','w')
-    subor_ucty_NEW=open('UCTY_NEW.txt','r')
-    riadok=subor_ucty_NEW.readline().strip()
-    subor_ucty.write(str(pocet_uctov))
-    while riadok!='':
+        subor_ucty=open('UCTY.txt','w')
+        subor_ucty_NEW=open('UCTY_NEW.txt','r')
         riadok=subor_ucty_NEW.readline().strip()
-        subor_ucty.write('\n'+riadok)
-    subor_ucty.close()
-    subor_ucty_NEW.close()
-    os.remove('UCTY_NEW.txt')
+        subor_ucty.write(str(pocet_uctov))
+        while riadok!='':
+            riadok=subor_ucty_NEW.readline().strip()
+            subor_ucty.write('\n'+riadok)
+        subor_ucty.close()
+        subor_ucty_NEW.close()
+        #os.remove('UCTY_NEW.txt')
 
-    subor_verzia_ucty=open('UCTY_VERZIA.txt','r')
-    pocet_v_u=int(subor_verzia_ucty.readline())
-    print(pocet_v_u)
-    subor_verzia_ucty.close()
-    subor_verzia_ucty=open('UCTY_VERZIA.txt','w')
-    pocet_v_u+=1
-    print(pocet_v_u)
-    subor_verzia_ucty.write(str(pocet_v_u))
-    print('VVVVV'+str(pocet_v_u))
-    subor_verzia_ucty.close()
+        subor_ucty=open('UCTY.txt','w')
+        subor_ucty_NEW=open('UCTY_NEW.txt','r')
+        pocet_uctov=subor_ucty_NEW.readline().strip()
+        subor_ucty.write(str(pocet_uctov))
+        for hh in range(int(pocet_uctov)):
+            riadok = subor_ucty_NEW.readline().strip()
+            split=riadok.split(';')
+            if split[2] == prijemca_entry.get():
+                print('nasiel som')
+                novy_riadok = split
+                novy_riadok[4]=str(novy_stav_komu)
+                riadok = ';'.join(novy_riadok)
+                subor_ucty.write('\n'+riadok)
+            else:
+                subor_ucty.write('\n'+riadok)
+        subor_ucty_NEW.close()
+        subor_ucty.close()
+        os.remove('UCTY_NEW.txt')
+        
+        subor_verzia_ucty=open('UCTY_VERZIA.txt','r')
+        pocet_v_u=int(subor_verzia_ucty.readline())
+        print(pocet_v_u)
+        subor_verzia_ucty.close()
+        subor_verzia_ucty=open('UCTY_VERZIA.txt','w')
+        pocet_v_u+=1
+        print(pocet_v_u)
+        subor_verzia_ucty.write(str(pocet_v_u))
+        print('VVVVV'+str(pocet_v_u))
+        subor_verzia_ucty.close()
 
-    subor_verzia_transakcie_ucty=open('TRANSAKCIE_UCTY_VERZIA.txt','r')
-    pocet_v_t_u=int(subor_verzia_transakcie_ucty.readline())
-    print(pocet_v_t_u)
-    subor_verzia_transakcie_ucty.close()
-    subor_verzia_transakcie_ucty=open('TRANSAKCIE_UCTY_VERZIA.txt','w')
-    pocet_v_t_u+=1
-    print(pocet_v_t_u)
-    subor_verzia_transakcie_ucty.write(str(pocet_v_t_u))
-    subor_verzia_transakcie_ucty.close()
+        subor_verzia_transakcie_ucty=open('TRANSAKCIE_UCTY_VERZIA.txt','r')
+        pocet_v_t_u=int(subor_verzia_transakcie_ucty.readline())
+        print(pocet_v_t_u)
+        subor_verzia_transakcie_ucty.close()
+        subor_verzia_transakcie_ucty=open('TRANSAKCIE_UCTY_VERZIA.txt','w')
+        pocet_v_t_u+=1
+        print(pocet_v_t_u)
+        subor_verzia_transakcie_ucty.write(str(pocet_v_t_u))
+        subor_verzia_transakcie_ucty.close()
     
     bol_platobny=True
     
@@ -552,6 +578,7 @@ def splatit():
         subor.close()
         subor_ = open('KARTY_.txt','w')
         subor = open('KARTY.txt','r+')
+        #subor = open('KARTY.txt',encoding='utf-8')
         for a in range(int(pocet_kariet)+1):
             riadok = subor.readline().strip()
             if a==0:
@@ -704,7 +731,7 @@ def karty_def():
         karty_list.place(x=w//2+65,y=200)
         karty_list.bind('<<ListboxSelect>>',vyber_karty_def)
         
-        can.create_text(w//2+255,150,text='KARTY',font='Arial 25')
+        can.create_text(w//2+255,150,text='KARTY',font='Arial 25', fill='#146381')
 
         suma2_entry = tk.Entry(root)
         suma2_entry.place(width=200,height=35,x=w//2+155,y=h-300)
@@ -748,7 +775,7 @@ def prijmy_def():
     citaj_klientov()
     pocet=18
     
-    prijmy=can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25')
+    prijmy=can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25', fill='#146381')
     prijmy_list = tk.Listbox(root, width=43, height = pocet, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
     cislo=0
     for i in range(pocet_transakcii):
@@ -910,6 +937,7 @@ def citaj_klientov():
     if not lock_klienti:
         lock_subor = open('KLIENTI_LOCK.txt','w')
         subor = open('KLIENTI.txt','r+')
+        #subor = open('KLIENTI.txt',encoding='utf-8')
         pocet = int(subor.readline().strip())
         krstne_meno=[]
         priezvisko=[]
