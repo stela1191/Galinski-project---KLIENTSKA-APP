@@ -51,7 +51,7 @@ def round_rectangle(x1, y1, x2, y2, radius=50, color='black', **kwargs):
     return can.create_polygon(points, **kwargs, smooth=True,fill=color)
 
 def kontrola_verzii():
-    global klienti_verzia_var, ucty_verzia_var, karty_verzia_var, tran_ucty_verzia_var
+    global klienti_verzia_var, ucty_verzia_var, karty_verzia_var, tran_ucty_verzia_var,z_loginu
     subor = open('KLIENTI_VERZIA.txt','r')
     verzia = subor.readline().strip()
     #if klienti_verzia_var == verzia:
@@ -69,6 +69,10 @@ def kontrola_verzii():
     if not ucty_verzia_var == verzia:
         ucty_verzia_var = verzia
         print('zmena_v_uctu:', ucty_verzia_var)
+        if frame_2:
+            z_loginu=True
+            frame2()
+            z_loginu=False
     subor.close()
     
     subor = open('KARTY_VERZIA.txt','r')
@@ -488,9 +492,9 @@ def sprav_platobny_prikaz():
     
     subor_ucty=open('UCTY.txt','r')
     subor_ucty_NEW=open('UCTY_NEW.txt','w')
+    print(stav_vybrateho_uctu,stav)
     for line in subor_ucty:
         subor_ucty_NEW.write(line.replace(stav_vybrateho_uctu,stav))
-
     subor_ucty.close()
     subor_ucty_NEW.close()
 
@@ -500,6 +504,7 @@ def sprav_platobny_prikaz():
     subor_ucty.write(str(pocet_uctov))
     while riadok!='':
         riadok=subor_ucty_NEW.readline().strip()
+        print(riadok)
         subor_ucty.write('\n'+riadok)
     subor_ucty.close()
     subor_ucty_NEW.close()
@@ -511,7 +516,7 @@ def sprav_platobny_prikaz():
     subor_verzia_ucty.close()
     subor_verzia_ucty=open('UCTY_VERZIA.txt','w')
     pocet_v_u+=1
-    print(pocet_v_u)
+    print('VVVVV'+str(pocet_v_u))
     subor_verzia_ucty.write(str(pocet_v_u))
     subor_verzia_ucty.close()
 
