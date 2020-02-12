@@ -303,7 +303,7 @@ def frame3():
                 print(celkova_suma)
         for i in range(pocet_transakcii):
             if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='H':
-                trans_list.insert(cislo, 'SK'+22*'*'+(120-len(suma[i]))*' '+suma[i]+' €')
+                trans_list.insert(cislo, 'SK'+22*'*'+(130-len(suma[i]))*' '+suma[i]+' €')
                 trans_list.insert(cislo+1, 'Prevod hotovostou')
                 trans_list.insert(cislo+2, '')
                 if int(float(suma[i]))>0:
