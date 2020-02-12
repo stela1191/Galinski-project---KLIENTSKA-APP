@@ -9,15 +9,7 @@ w=1280
 
 # DOROBIT : - vytvorenie LOCKU ked s tym pracujem, vymazanie locku, close subor
 #           - vysvietit naraz
-#           - Refreshovat ucty a hlavne pocet transakcii po platobnom prikaze inac nejdu transakcie ani prijmy
-#           - Grafiku
-#           - Dorobit Transakcie ucty pridat zplatenie kreditnej karty 
-
-# HOTOVE :  - Platobny prikaz je pripraveny
-#           - Dorobit citanie transakcii desatinne cisla
-# OTAZKY :  - Neviem ako rozlisime pri zapisovani prijmu ci je to z kreditnej alebo debetnej karty
-
-
+#           - Dorobit Transakcie ucty pripisat sumu a pridat zplatenie kreditnej karty 
 
 root = tk.Tk()
 can = tk.Canvas(root,width=w,height=h, bg='#beefff')
@@ -69,10 +61,10 @@ def kontrola_verzii():
     if not ucty_verzia_var == verzia:
         ucty_verzia_var = verzia
         print('zmena_v_uctu:', ucty_verzia_var)
-        if frame_2:
-            z_loginu=True
-            frame2()
-            z_loginu=False
+    #if frame_2:
+     #       z_loginu=True
+      #      frame2()
+       #     z_loginu=False
     subor.close()
     
     subor = open('KARTY_VERZIA.txt','r')
@@ -159,7 +151,7 @@ def frame2():
                     typ_u = 'SÚKROMNÝ ÚČET '
                 else:
                     typ_u = 'OBCHODNÝ ÚČET '
-                ucty_list.insert(poradie*2, typ_u+ ' '*(50- len(stav_uctu[l])) + str(round(float(stav_uctu[l]), 2))+' €')
+                ucty_list.insert(poradie*2, typ_u+ ' '*(40- len(stav_uctu[l])) + str(round(float(stav_uctu[l]), 2))+' €')
                 ucty_list.insert(poradie*2, str(cislo_uctu[l]) )
                 id_uctov_frame2.append(id_uctu[l])
        
@@ -170,10 +162,10 @@ def frame2():
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='disabled')
         transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
-        platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='disabled')
+        platprik_btn=tk.Button(root,text='PLATOBNÝ PRÍKAZ',command=platobny_prikaz_def, state='disabled')
         platprik_btn.place(width=200,height=35,x=w//2-355,y=420)
         
-        prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='disabled')
+        prijmy_btn=tk.Button(root,text='PRÍJMY',command=prijmy_def, state='disabled')
         prijmy_btn.place(width=200,height=35,x=w//2-355,y=465)
         
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='disabled')
@@ -191,10 +183,10 @@ def frame2():
         transakcia_btn=tk.Button(root,text='TRANSAKCIA',command=frame3, state='active')
         transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
-        platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='active')
+        platprik_btn=tk.Button(root,text='PLATOBNÝ PRÍKAZ',command=platobny_prikaz_def, state='active')
         platprik_btn.place(width=200,height=35,x=w//2-355,y=420)
         
-        prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='active')
+        prijmy_btn=tk.Button(root,text='PRÍJMY',command=prijmy_def, state='active')
         prijmy_btn.place(width=200,height=35,x=w//2-355,y=465)
         
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
@@ -228,17 +220,16 @@ def potvrd_ucet_def():
         transakcia_btn.place(width=200,height=35,x=w//2-355,y=375)
         
         platprik_btn.destroy()
-        platprik_btn=tk.Button(root,text='PLATOBNY PRIKAZ',command=platobny_prikaz_def, state='active')
+        platprik_btn=tk.Button(root,text='PLATOBNÝ PRÍKAZ',command=platobny_prikaz_def, state='active')
         platprik_btn.place(width=200,height=35,x=w//2-355,y=420)
         
         prijmy_btn.destroy()
-        prijmy_btn=tk.Button(root,text='PRIJMY',command=prijmy_def, state='active')
+        prijmy_btn=tk.Button(root,text='PRÍJMY',command=prijmy_def, state='active')
         prijmy_btn.place(width=200,height=35,x=w//2-355,y=465)
         
         karty_btn.destroy()
         karty_btn=tk.Button(root,text='KARTY',command=karty_def, state='active')
         karty_btn.place(width=200,height=35,x=w//2-355,y=510)
-
         
 def vyber_ucet_def(event):
     global vybraty_ucet, stav_vybrateho_uctu
@@ -312,7 +303,7 @@ def frame3():
                 print(celkova_suma)
         for i in range(pocet_transakcii):
             if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='H':
-                trans_list.insert(cislo, 'SK'+22*'*'+(130-len(suma[i]))*' '+suma[i]+' €')
+                trans_list.insert(cislo, 'SK'+22*'*'+(120-len(suma[i]))*' '+suma[i]+' €')
                 trans_list.insert(cislo+1, 'Prevod hotovostou')
                 trans_list.insert(cislo+2, '')
                 if int(float(suma[i]))>0:
@@ -386,7 +377,7 @@ def platobny_prikaz_def():
     kon_ucty()
     citaj_ucty()
 
-    can.create_text(w//2+255,150,text='PLATOBNY PRIKAZ',font='Arial 25')
+    can.create_text(w//2+255,150,text='PLATOBNÝ PRÍKAZ',font='Arial 25')
     
     potvrdplatbu_btn=tk.Button(root,text='POTVRDIŤ PLATBU',command=sprav_platobny_prikaz,state='active')
     potvrdplatbu_btn.place(width=200,height=35,x=w//2+155,y=340)
@@ -397,7 +388,7 @@ def platobny_prikaz_def():
     suma_entry = tk.Entry(root)
     suma_entry.place(width=200,height=35,x=w//2+155,y=280)
     
-    can.create_text(w//2+255,190,text='Prijemca')
+    can.create_text(w//2+255,190,text='Príjemca')
     can.create_text(w//2+255,260,text='Suma')
     
     karty_tf=False
@@ -405,7 +396,7 @@ def platobny_prikaz_def():
     prijmy_tf=False
 
 def sprav_platobny_prikaz():
-    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov, id_suvisiacej_transakcie,stav,vymaz_pravu_stranu, potvrdplatbu_btn, frame_2,spat_def, bol_platobny
+    global stav_vybrateho_uctu, suma_entry, prijemca_entry, prihlaseny_ID, pocet_uctov, id_suvisiacej_transakcie,stav,vymaz_pravu_stranu, potvrdplatbu_btn,udaj, frame_2,spat_def, bol_platobny,dalej_btn
     subor_transakcie=open('TRANSAKCIE_UCTY.txt','r')
     subor_transakcie_NEW=open('TRANSAKCIE_UCTY_NEW.txt','w')
     subor_ucty=open('UCTY.txt','r')
@@ -461,6 +452,9 @@ def sprav_platobny_prikaz():
                 subor_transakcie_NEW.write('\n'+(str(pocet_transakcii+2))+';'+'D'+';'+'P'+';'+id_uctu[u]+';'+id_klienta_ucty[u]+';'+'+'+suma_entry.get()+';'+(str(pocet_transakcii+1))+';'+datum+';'+prihlaseny_ID)
                 print('Moze prebehnut')
                 uspesna=1
+                print('KOMU UDAJE '+id_klienta_ucty[u]+' '+cislo_uctu[u]+' '+stav_uctu[u])
+                novy_stav_komu=(str(float(stav_uctu[u])+float(suma_entry.get())))
+                print(novy_stav_komu)
             if uspesna==1:
                 uspesna=0
                 p=str(pocet_transakcii+2)
@@ -492,9 +486,10 @@ def sprav_platobny_prikaz():
     
     subor_ucty=open('UCTY.txt','r')
     subor_ucty_NEW=open('UCTY_NEW.txt','w')
-    print(stav_vybrateho_uctu,stav)
+    stav=(str(float(stav_vybrateho_uctu)-float(suma_entry.get())))
     for line in subor_ucty:
         subor_ucty_NEW.write(line.replace(stav_vybrateho_uctu,stav))
+
     subor_ucty.close()
     subor_ucty_NEW.close()
 
@@ -504,7 +499,6 @@ def sprav_platobny_prikaz():
     subor_ucty.write(str(pocet_uctov))
     while riadok!='':
         riadok=subor_ucty_NEW.readline().strip()
-        print(riadok)
         subor_ucty.write('\n'+riadok)
     subor_ucty.close()
     subor_ucty_NEW.close()
@@ -516,8 +510,9 @@ def sprav_platobny_prikaz():
     subor_verzia_ucty.close()
     subor_verzia_ucty=open('UCTY_VERZIA.txt','w')
     pocet_v_u+=1
-    print('VVVVV'+str(pocet_v_u))
+    print(pocet_v_u)
     subor_verzia_ucty.write(str(pocet_v_u))
+    print('VVVVV'+str(pocet_v_u))
     subor_verzia_ucty.close()
 
     subor_verzia_transakcie_ucty=open('TRANSAKCIE_UCTY_VERZIA.txt','r')
@@ -534,9 +529,12 @@ def sprav_platobny_prikaz():
     
 def po_platobnom():
     global vymaz_pravu_stranu, dalej_btn,potvrdplatbu_btn
+    can.delete('all')
+    dalej_btn.destroy()
     potvrdplatbu_btn.destroy()
     vymaz_pravu_stranu()
     frame2()
+    
     
 def splatit():
     global splatene,suma2_entry,karty_list,kreditka,splatenie,dlh_vybratej_karty,stav_vybrateho_uctu
@@ -799,9 +797,9 @@ def login():
     PW_entry.place(x=1/2*w + 240,y=h-(0.62*h)+35,height=30)
     PW_entry.bind("<Return>", login_cez_enter)
     
-    prihlasit_btn = tk.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=prihlas)
+    prihlasit_btn = tk.Button(text='PRIHLÁSIŤ SA', font="Helvetica 15",command=prihlas)
     prihlasit_btn.pack()
-    prihlasit_btn.place(x=1/2*w,y=h-(0.4*h))
+    prihlasit_btn.place(x=0.85*w,y=h-(0.45*h))
     
     menuImg = tk.PhotoImage(master=can,file='obrazky/menu.png')
     
@@ -817,8 +815,6 @@ def odhlas():
     odhlasenie_btn.destroy()
     vymaz_pravu_stranu()
     vymaz_lavu_stranu()
-    if bol_platobny:
-        dalej_btn.destroy()
     if bol_f3:
         scrollbar.destroy()
         trans_list.destroy()
@@ -866,8 +862,6 @@ def spat_def():
     spat_btn.destroy()
     otvor_okienko.destroy()
     labelMenuImg.destroy()
-    if bol_platobny:
-        dalej_btn.destroy()
     frame2()
 
 def prihlas():
