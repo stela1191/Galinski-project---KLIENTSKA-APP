@@ -777,21 +777,35 @@ def prijmy_def():
     
     prijmy=can.create_text(w//2+255,150,text='PRIJMY',font='Arial 25', fill='#146381')
     prijmy_list = tk.Listbox(root, width=43, height = pocet, font='Arial 13',selectmode='SINGLE', xscrollcommand=True)
+    can.create_text(w//2,75,text='Transakcie', font= 'Arial 25', fill='#146381')
     cislo=0
-    for i in range(pocet_transakcii):
-        a=int(id_klienta_transakcie[i])
-        if  id_klienta_transakcie[i]==prihlaseny_ID and suma[i][0]=='+':
-            prijmy_list.insert(cislo, cislo_uctu[a]+(25-len(suma[i]))*' '+(suma[i])+' €')
-            prijmy_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
-            prijmy_list.insert(cislo+2, '')
-        cislo+=3
+    a=[]
+    if not lock_ucty and not lock_klienti and not lock_transakcie_ucty:
+        for i in range(pocet_transakcii):
+            if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='P' and (suma[i][0])=='+':
+                a=int(komu[i])
+                prijmy_list.insert(cislo, cislo_uctu[a]+(25-len(suma[i]))*' '+suma[i]+' €')
+                prijmy_list.insert(cislo+1, krstne_meno[a]+' '+priezvisko[a])
+                prijmy_list.insert(cislo+2, '')
+                if (suma[i][0])=='+':
+                    prijmy_list.itemconfig(cislo,{'fg': 'green'})
+                    prijmy_list.itemconfig(cislo+1,{'fg': 'green'})
+                cislo+=3
+        for i in range(pocet_transakcii):
+            if id_klienta_transakcie[i]==prihlaseny_ID and vybraty_ucet==id_uctu_transakcie[i] and h_alebo_p[i]=='H' and (suma[i][0])=='+':
+                prijmy_list.insert(cislo, 'SK'+22*'*'+(35-len(suma[i]))*' '+suma[i]+' €')
+                prijmy_list.insert(cislo+1, 'Prevod hotovostou')
+                prijmy_list.insert(cislo+2, '')
+                if (suma[i][0])=='+':
+                    prijmy_list.itemconfig(cislo,{'fg': 'green'})
+                    prijmy_list.itemconfig(cislo+1,{'fg': 'green'})
+                cislo+=3
 
     prijmy_list.place(x=w//2+65,y=200)
     
     karty_tf=False
     platobny_prikaz_tf=False
     prijmy_tf=True
-
 def login_cez_enter(sur):
     prihlas()
     
